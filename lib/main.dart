@@ -1,0 +1,420 @@
+import 'package:flutter/material.dart';
+import 'package:workoutcreator/globals.dart' as globals;
+void main() => runApp(MyApp());
+const int _blackPrimaryValue = 0xFF000000;
+const MaterialColor primaryBlack = MaterialColor(
+  _blackPrimaryValue,
+  <int, Color>{
+    50: Color(0xFF000000),
+    100: Color(0xFF000000),
+    200: Color(0xFF000000),
+    300: Color(0xFF000000),
+    400: Color(0xFF000000),
+    500: Color(_blackPrimaryValue),
+    600: Color(0xFF000000),
+    700: Color(0xFF000000),
+    800: Color(0xFF000000),
+    900: Color(0xFF000000),
+  },
+);
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Workout Creator',
+      theme: ThemeData(
+       primaryColor: Colors.black,
+       primarySwatch: primaryBlack,
+       accentColor: new Color(0xFF424242),
+       textTheme: TextTheme(
+         button: TextStyle(
+           color: Colors.white,
+         ),
+         subtitle1: TextStyle(
+           color: Color(0xFFdbdbdb),
+         )
+       ),
+      ),
+      home: MyHomePage(title: 'Home'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key, this.title}) : super(key: key);
+
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  Future<List<String>> _workouts = globals.getWorkouts();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title,),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.grey,
+            height: 4.0,
+          ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
+      ),
+      backgroundColor: Theme.of(context).primaryColor,
+      body: Center(
+        child: Container(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                FutureBuilder<List<String>>(
+                  future: _workouts,
+                  builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+                    List<Widget> children = [];
+                    if (snapshot.hasData) {
+                      if(snapshot.data == null) {
+                        children.add(Text("No Workouts"));
+                      } else if(snapshot.data.length > 0)
+                        for(int i = 0; i < snapshot.data.length; i++) {
+                          if(snapshot.data[i] != null) {
+                            Widget addition = Card(
+                              color: Theme.of(context).accentColor,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  ListTile(
+                                    title: Text(snapshot.data[i], style: Theme.of(context).textTheme.button),
+                                    trailing: IconButton(
+                                      icon: Icon(Icons.arrow_right),
+                                      onPressed: () {
+                                        //TODO: Navigate to Workout
+                                        String fileName = snapshot.data[i] + ".json";
+                                        Future<globals.Workout> workout = globals.getWorkout(fileName);
+                                        workout.then((data){
+                                          Navigator.push(context,
+                                            MaterialPageRoute(builder: (context) => WorkoutPage(workout: data)),
+                                          );
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                            children.add(addition);
+                          }
+                        } else {
+                        children.add(Text("No Saved Workouts"));
+                      }
+                    } else {
+                      children.add(Text("Error"));
+                    }
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: children,
+                    );
+                  }
+                ),
+                RaisedButton(
+                  child: Text("+ Create Workout"),
+                  onPressed: () {
+                    Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => WorkoutBuilderPage(title: "Workout Builder")),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+class WorkoutBuilderPage extends StatefulWidget {
+  WorkoutBuilderPage({Key key, this.title}) : super(key: key);
+  //The title passed in from the home page
+  final String title;
+  @override
+  _WorkoutBuilderPageState createState() => _WorkoutBuilderPageState();
+}
+
+class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
+  final _formKey = GlobalKey<FormState>();
+  final nameController = TextEditingController();
+  List<DropdownMenuItem<int>> muscleList = [];
+  List<int> selectedMuscles = [];
+  int muscleGroupButtons = 1;
+  Widget getMGBColumn() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: getMGBWidgets(),
+    );
+  }
+  List<Widget> getMGBWidgets() {
+    List<Widget> widgets = [];
+    for(int i = 0; i < muscleGroupButtons; i++) {
+      widgets.add(getMuscleGroupButton(i));
+    }
+    return widgets;
+  }
+  Widget getMuscleGroupButton(int index) {
+    if(selectedMuscles.length == index) {
+      selectedMuscles.add(0);
+    }
+    return DropdownButton(
+      dropdownColor: Theme.of(context).accentColor,
+      focusColor: Color(0xFF525252),
+      items: muscleList,
+      hint: new Text('Select Muscle (Group)', style: Theme.of(context).textTheme.button),
+      value: selectedMuscles[index],
+      onChanged: (value) {
+        setState(() {
+          selectedMuscles[index] = value;
+        });
+      }
+    );
+  }
+  @override
+  Widget build(BuildContext context) {
+    loadMuscleList();
+    return Scaffold(
+      appBar: AppBar(
+          title: Text(widget.title, style: Theme.of(context).textTheme.button),
+          bottom: PreferredSize(
+            child: Container(
+              color: Colors.grey,
+              height: 4.0,
+            ),
+            preferredSize: Size.fromHeight(4.0),
+          ),
+       ),
+      backgroundColor: Theme.of(context).primaryColor,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Form(
+            key: _formKey,
+            child: Column(
+              children: <Widget>[
+                TextFormField(
+                  autocorrect: true,
+                  style: Theme.of(context).textTheme.button,
+                  cursorColor: Colors.white,
+                  validator: (value) {
+                    if(value.isEmpty) {
+                      return 'You need to enter a workout name';
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Workout Name',
+                    labelStyle: TextStyle( color: Color(0xFFdbdbdb)),
+                    contentPadding: EdgeInsets.all(20.0),
+                  ),
+                  controller: nameController,
+                ),
+                getMGBColumn(),
+                RaisedButton(
+                  color: Theme.of(context).accentColor,
+                  focusColor: Color(0xFF525252),
+                  child: Text("Add Another Muscle (group)", style: Theme.of(context).textTheme.button),
+                  onPressed: () {
+                    setState(() {
+                      muscleGroupButtons += 1;
+                    });
+                  },
+                ),
+                RaisedButton(
+                  color: Theme.of(context).accentColor,
+                  focusColor: Color(0xFF525252),
+                  child: Text("Create Workout", style: Theme.of(context).textTheme.button),
+                  onPressed: () {
+                    if(_formKey.currentState.validate()) {
+                      String name = nameController.text;
+                      List<int> muscleChoices = [];
+                      for(int i = 0; i < muscleGroupButtons; i++) {
+                        muscleChoices.add(selectedMuscles[i]);
+                      }
+
+                      globals.Workout workout = globals.createWorkout(name, muscleChoices);
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                      Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => WorkoutPage(workout: workout)),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void loadMuscleList() {
+    if(selectedMuscles.length == 0) {
+      selectedMuscles.add(0);
+    }
+    muscleList = [];
+    muscleList.add(new DropdownMenuItem(
+      child: new Text("Trapezius", style: Theme.of(context).textTheme.button),
+      value: globals.TRAPEZIUS,
+    ));
+    muscleList.add(new DropdownMenuItem(
+      child: new Text("Deltoids", style: Theme.of(context).textTheme.button),
+      value: globals.DELTOIDS,
+    ));
+    muscleList.add(new DropdownMenuItem(
+      child: new Text("Triceps", style: Theme.of(context).textTheme.button),
+      value: globals.TRICEPS,
+    ));
+    muscleList.add(new DropdownMenuItem(
+      child: new Text("Biceps", style: Theme.of(context).textTheme.button),
+      value: globals.BICEPS,
+    ));
+    muscleList.add(new DropdownMenuItem(
+      child: new Text("Chest", style: Theme.of(context).textTheme.button),
+      value: globals.CHEST,
+    ));
+    muscleList.add(new DropdownMenuItem(
+      child: new Text("Rhomboids", style: Theme.of(context).textTheme.button),
+      value: globals.RHOMBOIDS,
+    ));
+    muscleList.add(new DropdownMenuItem(
+      child: new Text("Lats", style: Theme.of(context).textTheme.button),
+      value: globals.LATS,
+    ));
+    muscleList.add(new DropdownMenuItem(
+      child: new Text("Glutes", style: Theme.of(context).textTheme.button),
+      value: globals.GLUTES,
+    ));
+    muscleList.add(new DropdownMenuItem(
+      child: new Text("Quads", style: Theme.of(context).textTheme.button),
+      value: globals.QUADS,
+    ));
+    muscleList.add(new DropdownMenuItem(
+      child: new Text("Hamstrings", style: Theme.of(context).textTheme.button),
+      value: globals.HAMSTRINGS,
+    ));
+    muscleList.add(new DropdownMenuItem(
+      child: new Text("Calves", style: Theme.of(context).textTheme.button),
+      value: globals.CALVES,
+    ));
+    muscleList.add(new DropdownMenuItem(
+      child: new Text("Abs", style: Theme.of(context).textTheme.button),
+      value: globals.ABS,
+    ));
+    muscleList.add(new DropdownMenuItem(
+      child: new Text("Obliques", style: Theme.of(context).textTheme.button),
+      value: globals.OBLIQUES,
+    ));
+  }
+}
+
+class WorkoutPage extends StatefulWidget {
+  WorkoutPage({Key key, this.workout}) : super(key: key);
+  //The title passed in from the home page
+  final globals.Workout workout;
+  @override
+  _WorkoutPageState createState() => _WorkoutPageState();
+}
+
+class _WorkoutPageState extends State<WorkoutPage> {
+ @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.workout.getName(), style: Theme.of(context).textTheme.button),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.grey,
+            height: 4.0,
+          ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.home, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => MyHomePage(title: "Home")),
+            );
+          },
+        ),
+      ),
+      backgroundColor: Theme.of(context).primaryColor,
+      body: Container(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: buildExerciseList(),
+          ),
+        ),
+      ),
+    );
+  }
+  List<Widget> buildExerciseList() {
+    List<Widget> ls = [];
+    for(int i = 0; i < widget.workout.exercises.length; i++) {
+      Widget addition = Card(
+        color: Theme.of(context).accentColor,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              title: Text(widget.workout.exercises[i].name, style: Theme.of(context).textTheme.button),
+              subtitle: Text(widget.workout.exercises[i].subtitle(), style: Theme.of(context).textTheme.subtitle1),
+              trailing: IconButton(
+                icon: Icon(Icons.refresh),
+                color: Colors.white,
+                onPressed: () {
+                  setState(() {
+                    widget.workout.getBackup(i);
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+      ls.add(addition);
+    }
+    
+    ls.add(IconButton(
+      icon: Icon(Icons.remove_circle),
+      color: Colors.white,
+      onPressed: () {
+        Future<bool> rm = globals.removeWorkout(widget.workout.name);
+        rm.then((b){
+          if(b) {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => MyHomePage(title: "Home")),
+            );
+          }
+        });
+        
+      }
+    ));
+    return ls;
+  }
+
+}
