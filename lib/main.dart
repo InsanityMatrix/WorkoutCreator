@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:workoutcreator/config.dart';
 import 'package:workoutcreator/globals.dart' as globals;
+import 'package:select_form_field/select_form_field.dart';
 void main() => runApp(MyApp());
 const int _blackPrimaryValue = 0xFF000000;
 const MaterialColor primaryBlack = MaterialColor(
@@ -416,5 +418,152 @@ class _WorkoutPageState extends State<WorkoutPage> {
     ));
     return ls;
   }
+
+
+  
+}
+
+class SetupPage extends StatefulWidget {
+     SetupPage({Key key}) : super(key: key);
+    @override
+  _WorkoutPageState createState() => _WorkoutPageState();
+}
+
+class _SetupPageState extends State<SetupPage> {
+  var _formIndex = 0;
+  final _gymTypeFocusNode = FocusNode();
+  final _gymToolsFocusNode = FocusNode();
+  String gymType = '';
+  GlobalKey<FormState> _formKey1 = GlobalKey<FormState>();
+  TextEditingController _typeController;
+  final List<Map<String, dynamic>> _gyms = [
+    {
+      'value': 'Gym',
+      'label': 'Gym',
+      'icon' : Icon(Icons.fitness_center),
+      'textStyle': TextStyle(color: Colors.white),
+    },
+    {
+      'value': 'homeGym',
+      'label': 'Home Gym',
+      'icon' : Icon(Icons.home),
+      'textStyle': TextStyle(color: Colors.white),
+    },
+    {
+      'value': 'park',
+      'label': 'Calisthenics Park',
+      'icon' : Icon(Icons.park),
+      'textStyle': TextStyle(color: Colors.white),
+    }
+  ];
+  
+  @override
+  void initState() {
+    super.initState();
+    //Initial Values
+    _typeController = TextEditingController(text: 'Gym');
+
+  }
+  @override
+  void dispose() {
+    _gymTypeFocusNode.dispose();
+    _gymToolsFocusNode.dispose();
+    super.dispose();
+  }
+
+  void switchInputFields(int newIndex) {
+    setState(() {
+      _formIndex = newIndex;
+    });
+    newIndex == 0
+      ? FocusScope.of(context).requestFocus(_gymTypeFocusNode)
+      : FocusScope.of(context).requestFocus(_gymToolsFocusNode);
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: new AppBar(
+        title: Text("Setup", style: Theme.of(context).textTheme.button),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.grey,
+            height: 4.0,
+          ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Center(
+            child: IndexedStack(
+              index: _formIndex,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10.0),
+                  color: Theme.of(context).accentColor,
+                  width: MediaQuery.of(context).size.width * 0.75,
+                  height: MediaQuery.of(context).size.height * .5,
+                  child: Card(
+                    child: Form(
+                      key: _formKey1,
+                      child: Column(
+                        children: <Widget>[
+                          SelectFormField(
+                            controller: _typeController,
+                            icon: Icon(Icons.fitness_center),
+                            labelText: 'Gym Type',
+                            changeIcon: true,
+                            dialogTitle: 'Pick your gym type',
+                            items: _gyms,
+                            onChanged: (val) => setState(() => gymType = val),
+                            validator: (val) {
+                              setState(() {
+                                gymType = val;
+                              });
+                              return null;
+                            }
+                          ),
+                          RaisedButton(
+                            child: Text('Submit'),
+                            onPressed: () {
+                              final loForm = _formKey1.currentState;
+                              if (loForm.validate()) {
+                                loForm.save();
+                                if(gymType == 'homeGym') {
+                                  switchInputFields(1);
+                                } else {
+                                  //Save Form Data Here in CONFIG FILE
+                                  Config cfig = Config(gymType);
+                                  saveConfig(cfig);
+                                  Navigator.of(context).popUntil((route) => route.isFirst);
+                                  Navigator.pushReplacement(context,
+                                    MaterialPageRoute(builder: (context) => MyHomePage(title: "Home")),
+                                  );
+                                }
+                              }
+                            }
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  //Gym Tools
+                  //Only show if They choose home gym in the past question
+
+
+                ),
+                
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 
 }
