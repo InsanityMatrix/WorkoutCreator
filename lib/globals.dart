@@ -4,6 +4,7 @@ import 'dart:math';
 import 'dart:io';
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
+import 'package:workoutcreator/config.dart';
 class Workout {
   String name;
   List<Exercise> exercises;
@@ -52,12 +53,14 @@ class Exercise {
   String name;
   int primaryMuscle;
   List<int> secondaryMuscles;
+  List<String> equipment;
   
-  Exercise(this.name, this.primaryMuscle, this.secondaryMuscles);
+  Exercise(this.name, this.primaryMuscle, this.secondaryMuscles, this.equipment);
   Map<String, dynamic> toJson() => {
     'Name':name,
     'PrimaryMuscles':primaryMuscle,
     'SecondaryMuscles':secondaryMuscles,
+    'Equipment': equipment,
   };
 
   bool isPrimaryMuscle(int pMuscle) {
@@ -115,47 +118,49 @@ const int HAMSTRINGS = 12;
 //TODO: ADD MORE EXERCISES
 //Upper Body Exercises
 // ignore: non_constant_identifier_names
-Exercise SHRUGS = new Exercise("Shrugs", TRAPEZIUS, null);
+Exercise SHRUGS = new Exercise("Shrugs", TRAPEZIUS, null, ["dumbbell", "barbell"]);
 // ignore: non_constant_identifier_names
-Exercise FARMERS_WALK = new Exercise("Farmers Walk", TRAPEZIUS, [DELTOIDS, ABS, OBLIQUES, CALVES]);
+Exercise FARMERS_WALK = new Exercise("Farmers Walk", TRAPEZIUS, [DELTOIDS, ABS, OBLIQUES, CALVES], ["dumbbell", "barbell"]);
 // ignore: non_constant_identifier_names
-Exercise BENCHPRESS = new Exercise("Benchpress", CHEST, [DELTOIDS,TRICEPS, ABS]);
+Exercise BENCHPRESS = new Exercise("Benchpress", CHEST, [DELTOIDS,TRICEPS, ABS], ["barbell", "dumbbell"]);
 // ignore: non_constant_identifier_names
-Exercise SHOULDER_PRESS = new Exercise("Shoulder Press", DELTOIDS, [TRAPEZIUS, TRICEPS, ABS]);
+Exercise SHOULDER_PRESS = new Exercise("Shoulder Press", DELTOIDS, [TRAPEZIUS, TRICEPS, ABS], ["barbell", "dumbbell"]);
 // ignore: non_constant_identifier_names
-Exercise DIPS = new Exercise("Dips", TRICEPS, [CHEST, DELTOIDS, RHOMBOIDS]);
-Exercise CONCENTRATION_CURLS = new Exercise("Concentration Curls", BICEPS, null);
-Exercise BENT_OVER_BARBELL_ROW = new Exercise("Bent over barbell row", DELTOIDS, [TRAPEZIUS, LATS, RHOMBOIDS, BICEPS]);
-Exercise LATERAL_RAISES = new Exercise("Lateral Raises", DELTOIDS, [TRAPEZIUS]);
-Exercise PULLUPS = new Exercise("Pullups", LATS, [TRAPEZIUS, RHOMBOIDS, BICEPS]);
-Exercise CHINUPS = new Exercise("Chinups", BICEPS, [LATS, DELTOIDS,]);
-Exercise LAT_PULLDOWNS = new Exercise("Lat Pulldowns", LATS, [RHOMBOIDS, TRAPEZIUS]);
-Exercise REAR_DELT_FLY = new Exercise("Rear Delt Fly", DELTOIDS, [TRAPEZIUS, RHOMBOIDS]);
-Exercise ARNOLD_PRESS = new Exercise("Arnold Press", DELTOIDS, [TRICEPS]);
-Exercise W_Raise = new Exercise("W-Raise", DELTOIDS, [TRAPEZIUS]);
-Exercise TRICEP_KICKBACK = new Exercise("Tricep Kickback", TRICEPS, null);
-Exercise SKULL_CRUSHERS = new Exercise("Skullcrushers", TRICEPS, null);
-Exercise HAMMER_CURL = new Exercise("Hammer Curls", BICEPS, null);
-Exercise CHEST_FLY = new Exercise("Chest Fly", CHEST, [DELTOIDS]);
-Exercise PEC_DECK = new Exercise("Pec Deck", CHEST, null);
-Exercise PRONE_LATERAL_RAISE = new Exercise("Prone Lateral Raise", RHOMBOIDS, null);
-Exercise BENT_OVER_DUMBELL_ROW = new Exercise("Bent Over Dumbell Row", RHOMBOIDS, [DELTOIDS, TRAPEZIUS, LATS]);
-Exercise SQUEEZE_PRESS = new Exercise("Squeeze Press", CHEST, [TRICEPS]);
-Exercise PLATE_PRESS = new Exercise("Plate Press", CHEST, [TRICEPS]);
+Exercise DIPS = new Exercise("Dips", TRICEPS, [CHEST, DELTOIDS, RHOMBOIDS], ["dipbars", "calisthenics"]);
+Exercise CONCENTRATION_CURLS = new Exercise("Concentration Curls", BICEPS, null, ["dumbbell"]);
+Exercise BENT_OVER_BARBELL_ROW = new Exercise("Bent over barbell row", DELTOIDS, [TRAPEZIUS, LATS, RHOMBOIDS, BICEPS], ["barbell"]);
+Exercise LATERAL_RAISES = new Exercise("Lateral Raises", DELTOIDS, [TRAPEZIUS], ["dumbbell"]);
+Exercise PULLUPS = new Exercise("Pullups", LATS, [TRAPEZIUS, RHOMBOIDS, BICEPS], ["pullupbar", "calisthenics"]);
+Exercise CHINUPS = new Exercise("Chinups", BICEPS, [LATS, DELTOIDS,], ["pullupbar", "calisthenics"]);
+Exercise LAT_PULLDOWNS = new Exercise("Lat Pulldowns", LATS, [RHOMBOIDS, TRAPEZIUS], ["cable"]);
+Exercise REAR_DELT_FLY = new Exercise("Rear Delt Fly", DELTOIDS, [TRAPEZIUS, RHOMBOIDS], ["flymachine", "dumbbell"]);
+Exercise ARNOLD_PRESS = new Exercise("Arnold Press", DELTOIDS, [TRICEPS], ["dumbbell"]);
+Exercise W_Raise = new Exercise("W-Raise", DELTOIDS, [TRAPEZIUS], ["dumbbell"]);
+Exercise TRICEP_KICKBACK = new Exercise("Tricep Kickback", TRICEPS, null, ["dumbbell"]);
+Exercise SKULL_CRUSHERS = new Exercise("Skullcrushers", TRICEPS, null, ["barbell","dumbbell"]);
+Exercise HAMMER_CURL = new Exercise("Hammer Curls", BICEPS, null, ["dumbbell"]);
+Exercise CHEST_FLY = new Exercise("Chest Fly", CHEST, [DELTOIDS], ["flymachine","dumbbell"]);
+Exercise PRONE_LATERAL_RAISE = new Exercise("Prone Lateral Raise", RHOMBOIDS, null, ["dumbbell"]);
+Exercise BENT_OVER_DUMBELL_ROW = new Exercise("Bent Over Dumbell Row", RHOMBOIDS, [DELTOIDS, TRAPEZIUS, LATS], ["dumbbell"]);
+Exercise SQUEEZE_PRESS = new Exercise("Squeeze Press", CHEST, [TRICEPS], ["dumbbell"]);
+Exercise PLATE_PRESS = new Exercise("Plate Press", CHEST, [TRICEPS], ["barbell"]);
+Exercise PUSHUPS = new Exercise("Pushups", CHEST, [TRICEPS], ["calisthenics"]);
 //Lower Body
-Exercise DEADLIFT = new Exercise("Deadlift", GLUTES, [QUADS, LATS, TRAPEZIUS]);
-Exercise BACK_SQUAT = new Exercise("Back Squat", GLUTES, [HAMSTRINGS, QUADS]);
-Exercise FRONT_SQUAT = new Exercise("Front Squat", QUADS, [ABS, GLUTES, HAMSTRINGS]);
-Exercise GOBLET_SQUAT = new Exercise("Goblet Squat", QUADS, [CALVES, GLUTES, ABS, HAMSTRINGS]);
-Exercise HIP_THRUSTS = new Exercise("Hip Thrust", GLUTES, null);
-Exercise LEG_CURL = new Exercise("Leg Curl", HAMSTRINGS, [CALVES]);
-Exercise LEG_EXTENSIONS = new Exercise("Leg Extensions", QUADS, null);
-Exercise STANDING_CALF_RAISE = new Exercise("Standing Calf Raise", CALVES, null);
-Exercise SEATED_CALF_RAISE = new Exercise("Seated Calf Raise", CALVES, null);
+Exercise DEADLIFT = new Exercise("Deadlift", GLUTES, [QUADS, LATS, TRAPEZIUS], ["barbell"]);
+Exercise BACK_SQUAT = new Exercise("Back Squat", GLUTES, [HAMSTRINGS, QUADS], ["barbell"]);
+Exercise FRONT_SQUAT = new Exercise("Front Squat", QUADS, [ABS, GLUTES, HAMSTRINGS], ["barbell"]);
+Exercise GOBLET_SQUAT = new Exercise("Goblet Squat", QUADS, [CALVES, GLUTES, ABS, HAMSTRINGS], ["dumbbell"]);
+Exercise HIP_THRUSTS = new Exercise("Hip Thrust", GLUTES, null, ["barbell"]);
+//TODO: Add this equipment
+Exercise LEG_CURL = new Exercise("Leg Curl", HAMSTRINGS, [CALVES], []);
+Exercise LEG_EXTENSIONS = new Exercise("Leg Extensions", QUADS, null, []);
+
+Exercise STANDING_CALF_RAISE = new Exercise("Standing Calf Raise", CALVES, null, ["barbell", "dumbbell","calisthenics"]);
+Exercise SEATED_CALF_RAISE = new Exercise("Seated Calf Raise", CALVES, null, ["dumbbell"]);
 //Core
-Exercise RUSSIAN_TWISTS = new Exercise("Russian Twists", OBLIQUES, [ABS]);
-Exercise LEG_LIFTS = new Exercise("Leg Lifts", ABS, null);
-Exercise CRUNCHES = new Exercise("Crunches", ABS, null);
+Exercise RUSSIAN_TWISTS = new Exercise("Russian Twists", OBLIQUES, [ABS], ["calisthenics"]);
+Exercise LEG_LIFTS = new Exercise("Leg Lifts", ABS, null, ["calisthenics"]);
+Exercise CRUNCHES = new Exercise("Crunches", ABS, null, ["calisthenics"]);
 
 
 
@@ -164,7 +169,7 @@ List<Exercise> EXERCISES = [
   SHRUGS, BENCHPRESS, SHOULDER_PRESS, DIPS, CONCENTRATION_CURLS,
   FARMERS_WALK, BENT_OVER_BARBELL_ROW, LATERAL_RAISES, PULLUPS,
   CHINUPS, LAT_PULLDOWNS, DEADLIFT, REAR_DELT_FLY, ARNOLD_PRESS,
-  TRICEP_KICKBACK, SKULL_CRUSHERS,HAMMER_CURL,CHEST_FLY,PEC_DECK,
+  TRICEP_KICKBACK, SKULL_CRUSHERS,HAMMER_CURL,CHEST_FLY, PUSHUPS,
   PRONE_LATERAL_RAISE, BENT_OVER_DUMBELL_ROW, BACK_SQUAT, FRONT_SQUAT,
   GOBLET_SQUAT, HIP_THRUSTS, LEG_CURL, LEG_EXTENSIONS, SQUEEZE_PRESS,
   PLATE_PRESS, RUSSIAN_TWISTS, LEG_LIFTS, CRUNCHES,STANDING_CALF_RAISE, 
@@ -172,7 +177,10 @@ List<Exercise> EXERCISES = [
 
 ];
 
-Workout createWorkout(String name, List<int> selectedMuscles) {
+Workout createWorkout(String name, List<int> selectedMuscles, Config config) {
+  if(config == null) {
+    //TODO: There was an ERROR
+  }
   List<Exercise> finalList = [];
   List<Exercise> lowPriorityList = [];
   List<Exercise> highPriorityList = [];
@@ -266,6 +274,158 @@ Workout createWorkout(String name, List<int> selectedMuscles) {
       }
     }
   }
+
+  //Go through config and make sure all workouts are applicable
+  if(config.gymType == "homeGym") {
+    //Home Gym Settings
+    //Filter first through main list then backup list, using backups to replace main if needed
+    List<String> _tools = config.gymTools;
+    _tools.add("calisthenics");
+
+    List<int> toRemoveF = [];
+    List<int> toReplaceFi = [];
+    List<Exercise> toReplaceF = [];
+    List<Exercise> toRemoveB = [];
+    finalList.forEach((exercise) {
+      bool hasEquipment = false;
+      exercise.equipment.forEach((equip){
+        _tools.forEach((tool) {
+          if(equip == tool) {
+            hasEquipment = true;
+          }
+        });
+        //if have equipment, move on to next, if not get new exercise
+        if(!hasEquipment) {
+          int i = finalList.indexOf(exercise);
+          int primaryMuscle = exercise.primaryMuscle;
+          bool replaced = false;
+          toRemoveF.add(i);
+          backups.forEach((ex) {
+            if(!replaced) {
+              if(ex.primaryMuscle == primaryMuscle) {
+                bool added = false;
+                ex.equipment.forEach((e) {
+                  _tools.forEach((tool) {
+                    if(!added) {
+                      if(tool == e) {
+                        added = true;
+                        toReplaceF.add(ex);
+                        toReplaceFi.add(i);
+                        replaced = true;
+                        toRemoveB.add(ex);
+                      }
+                    }
+                  });
+                });
+              }
+            }
+          });
+        }
+      });
+    });
+    //I dont remember how this works at all
+    for(int i = toRemoveF.length - 1; i >= 0; i--) {
+      finalList.removeAt(toRemoveF[i]);
+      if(toReplaceFi.contains(toRemoveF[i])) {
+        int j = toReplaceFi.indexOf(toRemoveF[i]);
+        finalList.insert(toReplaceFi[j], toReplaceF[j]);
+      }
+    }
+    for(int i = toRemoveB.length - 1; i >= 0; i--) {
+      backups.remove(toRemoveB[i]);
+    }
+    toRemoveB = [];
+    //Go through backups to see if they have equipment for backup exercises
+    backups.forEach((exercise) {
+      bool hasEquipment = false;
+      exercise.equipment.forEach((eq) {
+        _tools.forEach((e) {
+          if(eq == e) {
+            hasEquipment = true;
+          }
+        });
+      });
+      if(!hasEquipment) {
+        toRemoveB.add(exercise);
+      }
+    });
+    for(int i = toRemoveB.length - 1; i >= 0; i--) {
+      backups.remove(toRemoveB[i]);
+    }
+  } else if(config.gymType == "park"){
+    //Calisthenics settings
+    List<String> _tools = [ "calisthenics" ];
+    List<int> toRemoveF = [];
+    List<int> toReplaceFi = [];
+    List<Exercise> toReplaceF = [];
+    List<Exercise> toRemoveB = [];
+    finalList.forEach((exercise) {
+      bool hasEquipment = false;
+      exercise.equipment.forEach((equip){
+        _tools.forEach((tool) {
+          if(equip == tool) {
+            hasEquipment = true;
+          }
+        });
+        //if have equipment, move on to next, if not get new exercise
+        if(!hasEquipment) {
+          int i = finalList.indexOf(exercise);
+          int primaryMuscle = exercise.primaryMuscle;
+          bool replaced = false;
+          toRemoveF.add(i);
+          backups.forEach((ex) {
+            if(!replaced) {
+              if(ex.primaryMuscle == primaryMuscle) {
+                bool added = false;
+                ex.equipment.forEach((e) {
+                  _tools.forEach((tool) {
+                    if(!added) {
+                      if(tool == e) {
+                        added = true;
+                        toReplaceF.add(ex);
+                        toReplaceFi.add(i);
+                        replaced = true;
+                        toRemoveB.add(ex);
+                      }
+                    }
+                  });
+                });
+              }
+            }
+          });
+        }
+      });
+    });
+    //I dont remember how this works at all
+    for(int i = toRemoveF.length - 1; i >= 0; i--) {
+      finalList.removeAt(toRemoveF[i]);
+      if(toReplaceFi.contains(toRemoveF[i])) {
+        int j = toReplaceFi.indexOf(toRemoveF[i]);
+        finalList.insert(toReplaceFi[j], toReplaceF[j]);
+      }
+    }
+    for(int i = toRemoveB.length - 1; i >= 0; i--) {
+      backups.remove(toRemoveB[i]);
+    }
+    toRemoveB = [];
+    //Go through backups to see if they have equipment for backup exercises
+    backups.forEach((exercise) {
+      bool hasEquipment = false;
+      exercise.equipment.forEach((eq) {
+        _tools.forEach((e) {
+          if(eq == e) {
+            hasEquipment = true;
+          }
+        });
+      });
+      if(!hasEquipment) {
+        toRemoveB.add(exercise);
+      }
+    });
+    for(int i = toRemoveB.length - 1; i >= 0; i--) {
+      backups.remove(toRemoveB[i]);
+    }
+  }
   print("Final List: " + finalList.toString());
   Workout workout = new Workout.withBackups(name, finalList,backups);
   saveWorkout(workout);
@@ -319,7 +479,14 @@ Future<Workout> getWorkout(String filename) async {
         secondaryMuscles.add(j);
       });
     }
-    exercises.add(new Exercise(i['Name'], i['PrimaryMuscles'], secondaryMuscles));
+    List<String> equipment = [];
+    List e = i['Equipment'];
+    if (e != null) {
+      e.forEach((j) {
+        equipment.add(j);
+      });
+    }
+    exercises.add(new Exercise(i['Name'], i['PrimaryMuscles'], secondaryMuscles,equipment));
   });
   List<Exercise> backups = [];
   List bc = decoded['Backups'];
@@ -331,7 +498,14 @@ Future<Workout> getWorkout(String filename) async {
         secondaryMuscles.add(j);
       });
     }
-    backups.add(new Exercise(i['Name'], i['PrimaryMuscles'], secondaryMuscles));
+    List<String> equipment = [];
+    List e = i['Equipment'];
+    if (e != null) {
+      e.forEach((j) {
+        equipment.add(j);
+      });
+    }
+    backups.add(new Exercise(i['Name'], i['PrimaryMuscles'], secondaryMuscles,equipment));
   });
   workout = Workout.withBackups(decoded['Name'],exercises,backups);
   return workout;

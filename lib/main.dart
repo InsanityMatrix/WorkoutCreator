@@ -21,7 +21,7 @@ const MaterialColor primaryBlack = MaterialColor(
     900: Color(0xFF000000),
   },
 );
-
+Config mainConfig;
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -78,6 +78,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   SetupPage(),
           )
         );
+      } else {
+        getConfig().then((Config config) {
+          mainConfig = config;
+        });
       }
     });
     return Scaffold(
@@ -94,8 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       backgroundColor: Theme.of(context).primaryColor,
-      body: Center(
-        child: Container(
+      body:Container(
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -172,7 +175,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
-      ),
     );
   }
 }
@@ -289,7 +291,7 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                       }
 
                       globals.Workout workout =
-                          globals.createWorkout(name, muscleChoices);
+                          globals.createWorkout(name, muscleChoices, mainConfig);
                       Navigator.of(context).popUntil((route) => route.isFirst);
                       Navigator.pushReplacement(
                         context,
@@ -607,6 +609,7 @@ class _SetupPageState extends State<SetupPage> {
                                     //Save Form Data Here in CONFIG FILE
                                     Config cfig = Config(gymType);
                                     saveConfig(cfig);
+                                    mainConfig = cfig;
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
@@ -666,6 +669,7 @@ class _SetupPageState extends State<SetupPage> {
                                   Config cfig =
                                       Config.withTools(gymType, _gymTools);
                                   saveConfig(cfig);
+                                  mainConfig = cfig;
                                   Navigator.of(context)
                                       .popUntil((route) => route.isFirst);
                                   Navigator.pushReplacement(
