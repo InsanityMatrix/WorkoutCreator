@@ -114,10 +114,15 @@ const int HAMSTRINGS = 12;
 //DECLARE EXERCISES
 //TODO: ADD MORE EXERCISES
 //Upper Body Exercises
+// ignore: non_constant_identifier_names
 Exercise SHRUGS = new Exercise("Shrugs", TRAPEZIUS, null);
+// ignore: non_constant_identifier_names
 Exercise FARMERS_WALK = new Exercise("Farmers Walk", TRAPEZIUS, [DELTOIDS, ABS, OBLIQUES, CALVES]);
+// ignore: non_constant_identifier_names
 Exercise BENCHPRESS = new Exercise("Benchpress", CHEST, [DELTOIDS,TRICEPS, ABS]);
+// ignore: non_constant_identifier_names
 Exercise SHOULDER_PRESS = new Exercise("Shoulder Press", DELTOIDS, [TRAPEZIUS, TRICEPS, ABS]);
+// ignore: non_constant_identifier_names
 Exercise DIPS = new Exercise("Dips", TRICEPS, [CHEST, DELTOIDS, RHOMBOIDS]);
 Exercise CONCENTRATION_CURLS = new Exercise("Concentration Curls", BICEPS, null);
 Exercise BENT_OVER_BARBELL_ROW = new Exercise("Bent over barbell row", DELTOIDS, [TRAPEZIUS, LATS, RHOMBOIDS, BICEPS]);
@@ -289,7 +294,7 @@ Future<List<String>> getWorkouts() async {
   directory.list(recursive: false).forEach((f) {
     print("Path: " + f.path);
     String n = f.path.split("/").last;
-    if(n != "flutter_assets" && !n.startsWith("res_timestamp")) {
+    if(n != "flutter_assets" && !n.startsWith("res_timestamp") && n != "config.json") {
           names.add(n.replaceAll(".json", ""));
     }
   });
@@ -373,4 +378,5 @@ String getMuscleName(int muscle) {
       return "Hamstrings";
       break;
   } 
+  return "";
 }

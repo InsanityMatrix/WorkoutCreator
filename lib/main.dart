@@ -65,8 +65,21 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Future<List<String>> _workouts = globals.getWorkouts();
+  Future<bool> _configExists = configExists();
+ 
   @override
   Widget build(BuildContext context) {
+    _configExists.then((bool data) {
+      if(!data) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  SetupPage(),
+          )
+        );
+      }
+    });
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -111,7 +124,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                       trailing: IconButton(
                                         icon: Icon(Icons.arrow_right),
                                         onPressed: () {
-                                          //TODO: Navigate to Workout
                                           String fileName =
                                               snapshot.data[i] + ".json";
                                           Future<globals.Workout> workout =
@@ -454,14 +466,14 @@ class _WorkoutPageState extends State<WorkoutPage> {
 class SetupPage extends StatefulWidget {
   SetupPage({Key key}) : super(key: key);
   @override
-  _WorkoutPageState createState() => _WorkoutPageState();
+  _SetupPageState createState() => _SetupPageState();
 }
 
 class _SetupPageState extends State<SetupPage> {
   var _formIndex = 0;
   final _gymTypeFocusNode = FocusNode();
   final _gymToolsFocusNode = FocusNode();
-  List _gymTools;
+  List<String> _gymTools;
   String gymType = '';
   GlobalKey<FormState> _formKey1 = GlobalKey<FormState>();
   GlobalKey<FormState> _formKey2 = GlobalKey<FormState>();
@@ -472,19 +484,19 @@ class _SetupPageState extends State<SetupPage> {
       'value': 'Gym',
       'label': 'Gym',
       'icon': Icon(Icons.fitness_center),
-      'textStyle': TextStyle(color: Colors.white),
+      'textStyle': TextStyle(color: Colors.black),
     },
     {
       'value': 'homeGym',
       'label': 'Home Gym',
       'icon': Icon(Icons.home),
-      'textStyle': TextStyle(color: Colors.white),
+      'textStyle': TextStyle(color: Colors.black),
     },
     {
       'value': 'park',
       'label': 'Calisthenics Park',
       'icon': Icon(Icons.park),
-      'textStyle': TextStyle(color: Colors.white),
+      'textStyle': TextStyle(color: Colors.black),
     }
   ];
   final List<Map<String, dynamic>> _tools = [
@@ -537,6 +549,7 @@ class _SetupPageState extends State<SetupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).accentColor,
       appBar: new AppBar(
         title: Text("Setup", style: Theme.of(context).textTheme.button),
         bottom: PreferredSize(
@@ -594,8 +607,6 @@ class _SetupPageState extends State<SetupPage> {
                                     //Save Form Data Here in CONFIG FILE
                                     Config cfig = Config(gymType);
                                     saveConfig(cfig);
-                                    Navigator.of(context)
-                                        .popUntil((route) => route.isFirst);
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
@@ -632,15 +643,18 @@ class _SetupPageState extends State<SetupPage> {
                                   }
                                   return null;
                                 },
+                                textField: 'display',
+                                valueField: 'value',
                                 okButtonLabel: 'CONFIRM',
                                 cancelButtonLabel: 'CANCEL',
                                 hintWidget: Text(
-                                    'Please select any equipment you have'),
+                                    "Please select any equipment you have"),
                                 initialValue: _gymTools,
                                 onSaved: (value) {
                                   if (value == null) return;
                                   setState(() {
-                                    _gymTools = value;
+                                    List v = value;
+                                    _gymTools = v.cast<String>().toList();
                                   });
                                 }),
                             RaisedButton(

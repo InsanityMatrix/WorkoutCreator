@@ -29,7 +29,7 @@ void saveConfig(Config config) async {
 }
 
 Future<Config> getConfig() async {
-  final directory = await getApplicationDocumentsDirectory()
+  final directory = await getApplicationDocumentsDirectory();
   final path = directory.path;
   File cFile = File('$path/config.json');
   String json = await cFile.readAsString();
@@ -44,4 +44,14 @@ Future<Config> getConfig() async {
   }
   Config cfig = Config.withTools(gymType, gymTools);
   return cfig;
+}
+Future<bool> configExists() async {
+  final directory = await getApplicationDocumentsDirectory();
+  final path = directory.path;
+  File cFile = File('$path/config.json');
+  bool exists = await cFile.exists();
+  if(exists) {
+    return true;
+  }
+  return false;
 }
