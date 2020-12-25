@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:workoutcreator/config.dart';
 import 'package:workoutcreator/globals.dart' as globals;
 import 'package:select_form_field/select_form_field.dart';
+import 'package:multiselect_formfield/multiselect_formfield.dart';
+
 void main() => runApp(MyApp());
 const int _blackPrimaryValue = 0xFF000000;
 const MaterialColor primaryBlack = MaterialColor(
@@ -19,6 +21,7 @@ const MaterialColor primaryBlack = MaterialColor(
     900: Color(0xFF000000),
   },
 );
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -26,17 +29,16 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Workout Creator',
       theme: ThemeData(
-       primaryColor: Colors.black,
-       primarySwatch: primaryBlack,
-       accentColor: new Color(0xFF424242),
-       textTheme: TextTheme(
-         button: TextStyle(
-           color: Colors.white,
-         ),
-         subtitle1: TextStyle(
-           color: Color(0xFFdbdbdb),
-         )
-       ),
+        primaryColor: Colors.black,
+        primarySwatch: primaryBlack,
+        accentColor: new Color(0xFF424242),
+        textTheme: TextTheme(
+            button: TextStyle(
+              color: Colors.white,
+            ),
+            subtitle1: TextStyle(
+              color: Color(0xFFdbdbdb),
+            )),
       ),
       home: MyHomePage(title: 'Home'),
     );
@@ -67,7 +69,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title,),
+        title: Text(
+          widget.title,
+        ),
         bottom: PreferredSize(
           child: Container(
             color: Colors.grey,
@@ -84,58 +88,71 @@ class _MyHomePageState extends State<MyHomePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 FutureBuilder<List<String>>(
-                  future: _workouts,
-                  builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
-                    List<Widget> children = [];
-                    if (snapshot.hasData) {
-                      if(snapshot.data == null) {
-                        children.add(Text("No Workouts"));
-                      } else if(snapshot.data.length > 0)
-                        for(int i = 0; i < snapshot.data.length; i++) {
-                          if(snapshot.data[i] != null) {
-                            Widget addition = Card(
-                              color: Theme.of(context).accentColor,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  ListTile(
-                                    title: Text(snapshot.data[i], style: Theme.of(context).textTheme.button),
-                                    trailing: IconButton(
-                                      icon: Icon(Icons.arrow_right),
-                                      onPressed: () {
-                                        //TODO: Navigate to Workout
-                                        String fileName = snapshot.data[i] + ".json";
-                                        Future<globals.Workout> workout = globals.getWorkout(fileName);
-                                        workout.then((data){
-                                          Navigator.push(context,
-                                            MaterialPageRoute(builder: (context) => WorkoutPage(workout: data)),
-                                          );
-                                        });
-                                      },
+                    future: _workouts,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<String>> snapshot) {
+                      List<Widget> children = [];
+                      if (snapshot.hasData) {
+                        if (snapshot.data == null) {
+                          children.add(Text("No Workouts"));
+                        } else if (snapshot.data.length > 0)
+                          for (int i = 0; i < snapshot.data.length; i++) {
+                            if (snapshot.data[i] != null) {
+                              Widget addition = Card(
+                                color: Theme.of(context).accentColor,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    ListTile(
+                                      title: Text(snapshot.data[i],
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .button),
+                                      trailing: IconButton(
+                                        icon: Icon(Icons.arrow_right),
+                                        onPressed: () {
+                                          //TODO: Navigate to Workout
+                                          String fileName =
+                                              snapshot.data[i] + ".json";
+                                          Future<globals.Workout> workout =
+                                              globals.getWorkout(fileName);
+                                          workout.then((data) {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      WorkoutPage(
+                                                          workout: data)),
+                                            );
+                                          });
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            );
-                            children.add(addition);
+                                  ],
+                                ),
+                              );
+                              children.add(addition);
+                            }
                           }
-                        } else {
-                        children.add(Text("No Saved Workouts"));
+                        else {
+                          children.add(Text("No Saved Workouts"));
+                        }
+                      } else {
+                        children.add(Text("Error"));
                       }
-                    } else {
-                      children.add(Text("Error"));
-                    }
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: children,
-                    );
-                  }
-                ),
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: children,
+                      );
+                    }),
                 RaisedButton(
                   child: Text("+ Create Workout"),
                   onPressed: () {
-                    Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => WorkoutBuilderPage(title: "Workout Builder")),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              WorkoutBuilderPage(title: "Workout Builder")),
                     );
                   },
                 ),
@@ -147,7 +164,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
 
 class WorkoutBuilderPage extends StatefulWidget {
   WorkoutBuilderPage({Key key, this.title}) : super(key: key);
@@ -169,44 +185,47 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
       children: getMGBWidgets(),
     );
   }
+
   List<Widget> getMGBWidgets() {
     List<Widget> widgets = [];
-    for(int i = 0; i < muscleGroupButtons; i++) {
+    for (int i = 0; i < muscleGroupButtons; i++) {
       widgets.add(getMuscleGroupButton(i));
     }
     return widgets;
   }
+
   Widget getMuscleGroupButton(int index) {
-    if(selectedMuscles.length == index) {
+    if (selectedMuscles.length == index) {
       selectedMuscles.add(0);
     }
     return DropdownButton(
-      dropdownColor: Theme.of(context).accentColor,
-      focusColor: Color(0xFF525252),
-      items: muscleList,
-      hint: new Text('Select Muscle (Group)', style: Theme.of(context).textTheme.button),
-      value: selectedMuscles[index],
-      onChanged: (value) {
-        setState(() {
-          selectedMuscles[index] = value;
+        dropdownColor: Theme.of(context).accentColor,
+        focusColor: Color(0xFF525252),
+        items: muscleList,
+        hint: new Text('Select Muscle (Group)',
+            style: Theme.of(context).textTheme.button),
+        value: selectedMuscles[index],
+        onChanged: (value) {
+          setState(() {
+            selectedMuscles[index] = value;
+          });
         });
-      }
-    );
   }
+
   @override
   Widget build(BuildContext context) {
     loadMuscleList();
     return Scaffold(
       appBar: AppBar(
-          title: Text(widget.title, style: Theme.of(context).textTheme.button),
-          bottom: PreferredSize(
-            child: Container(
-              color: Colors.grey,
-              height: 4.0,
-            ),
-            preferredSize: Size.fromHeight(4.0),
+        title: Text(widget.title, style: Theme.of(context).textTheme.button),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.grey,
+            height: 4.0,
           ),
-       ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
+      ),
       backgroundColor: Theme.of(context).primaryColor,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -220,14 +239,14 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                   style: Theme.of(context).textTheme.button,
                   cursorColor: Colors.white,
                   validator: (value) {
-                    if(value.isEmpty) {
+                    if (value.isEmpty) {
                       return 'You need to enter a workout name';
                     }
                     return null;
                   },
                   decoration: const InputDecoration(
                     labelText: 'Workout Name',
-                    labelStyle: TextStyle( color: Color(0xFFdbdbdb)),
+                    labelStyle: TextStyle(color: Color(0xFFdbdbdb)),
                     contentPadding: EdgeInsets.all(20.0),
                   ),
                   controller: nameController,
@@ -236,7 +255,8 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                 RaisedButton(
                   color: Theme.of(context).accentColor,
                   focusColor: Color(0xFF525252),
-                  child: Text("Add Another Muscle (group)", style: Theme.of(context).textTheme.button),
+                  child: Text("Add Another Muscle (group)",
+                      style: Theme.of(context).textTheme.button),
                   onPressed: () {
                     setState(() {
                       muscleGroupButtons += 1;
@@ -246,19 +266,24 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                 RaisedButton(
                   color: Theme.of(context).accentColor,
                   focusColor: Color(0xFF525252),
-                  child: Text("Create Workout", style: Theme.of(context).textTheme.button),
+                  child: Text("Create Workout",
+                      style: Theme.of(context).textTheme.button),
                   onPressed: () {
-                    if(_formKey.currentState.validate()) {
+                    if (_formKey.currentState.validate()) {
                       String name = nameController.text;
                       List<int> muscleChoices = [];
-                      for(int i = 0; i < muscleGroupButtons; i++) {
+                      for (int i = 0; i < muscleGroupButtons; i++) {
                         muscleChoices.add(selectedMuscles[i]);
                       }
 
-                      globals.Workout workout = globals.createWorkout(name, muscleChoices);
+                      globals.Workout workout =
+                          globals.createWorkout(name, muscleChoices);
                       Navigator.of(context).popUntil((route) => route.isFirst);
-                      Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => WorkoutPage(workout: workout)),
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                WorkoutPage(workout: workout)),
                       );
                     }
                   },
@@ -272,7 +297,7 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
   }
 
   void loadMuscleList() {
-    if(selectedMuscles.length == 0) {
+    if (selectedMuscles.length == 0) {
       selectedMuscles.add(0);
     }
     muscleList = [];
@@ -340,11 +365,12 @@ class WorkoutPage extends StatefulWidget {
 }
 
 class _WorkoutPageState extends State<WorkoutPage> {
- @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.workout.getName(), style: Theme.of(context).textTheme.button),
+        title: Text(widget.workout.getName(),
+            style: Theme.of(context).textTheme.button),
         bottom: PreferredSize(
           child: Container(
             color: Colors.grey,
@@ -356,8 +382,10 @@ class _WorkoutPageState extends State<WorkoutPage> {
           icon: Icon(Icons.home, color: Colors.white),
           onPressed: () {
             Navigator.of(context).popUntil((route) => route.isFirst);
-            Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => MyHomePage(title: "Home")),
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MyHomePage(title: "Home")),
             );
           },
         ),
@@ -373,17 +401,20 @@ class _WorkoutPageState extends State<WorkoutPage> {
       ),
     );
   }
+
   List<Widget> buildExerciseList() {
     List<Widget> ls = [];
-    for(int i = 0; i < widget.workout.exercises.length; i++) {
+    for (int i = 0; i < widget.workout.exercises.length; i++) {
       Widget addition = Card(
         color: Theme.of(context).accentColor,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             ListTile(
-              title: Text(widget.workout.exercises[i].name, style: Theme.of(context).textTheme.button),
-              subtitle: Text(widget.workout.exercises[i].subtitle(), style: Theme.of(context).textTheme.subtitle1),
+              title: Text(widget.workout.exercises[i].name,
+                  style: Theme.of(context).textTheme.button),
+              subtitle: Text(widget.workout.exercises[i].subtitle(),
+                  style: Theme.of(context).textTheme.subtitle1),
               trailing: IconButton(
                 icon: Icon(Icons.refresh),
                 color: Colors.white,
@@ -399,33 +430,30 @@ class _WorkoutPageState extends State<WorkoutPage> {
       );
       ls.add(addition);
     }
-    
+
     ls.add(IconButton(
-      icon: Icon(Icons.remove_circle),
-      color: Colors.white,
-      onPressed: () {
-        Future<bool> rm = globals.removeWorkout(widget.workout.name);
-        rm.then((b){
-          if(b) {
-            Navigator.of(context).popUntil((route) => route.isFirst);
-            Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => MyHomePage(title: "Home")),
-            );
-          }
-        });
-        
-      }
-    ));
+        icon: Icon(Icons.remove_circle),
+        color: Colors.white,
+        onPressed: () {
+          Future<bool> rm = globals.removeWorkout(widget.workout.name);
+          rm.then((b) {
+            if (b) {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => MyHomePage(title: "Home")),
+              );
+            }
+          });
+        }));
     return ls;
   }
-
-
-  
 }
 
 class SetupPage extends StatefulWidget {
-     SetupPage({Key key}) : super(key: key);
-    @override
+  SetupPage({Key key}) : super(key: key);
+  @override
   _WorkoutPageState createState() => _WorkoutPageState();
 }
 
@@ -433,37 +461,63 @@ class _SetupPageState extends State<SetupPage> {
   var _formIndex = 0;
   final _gymTypeFocusNode = FocusNode();
   final _gymToolsFocusNode = FocusNode();
+  List _gymTools;
   String gymType = '';
   GlobalKey<FormState> _formKey1 = GlobalKey<FormState>();
+  GlobalKey<FormState> _formKey2 = GlobalKey<FormState>();
+
   TextEditingController _typeController;
   final List<Map<String, dynamic>> _gyms = [
     {
       'value': 'Gym',
       'label': 'Gym',
-      'icon' : Icon(Icons.fitness_center),
+      'icon': Icon(Icons.fitness_center),
       'textStyle': TextStyle(color: Colors.white),
     },
     {
       'value': 'homeGym',
       'label': 'Home Gym',
-      'icon' : Icon(Icons.home),
+      'icon': Icon(Icons.home),
       'textStyle': TextStyle(color: Colors.white),
     },
     {
       'value': 'park',
       'label': 'Calisthenics Park',
-      'icon' : Icon(Icons.park),
+      'icon': Icon(Icons.park),
       'textStyle': TextStyle(color: Colors.white),
     }
   ];
-  
+  final List<Map<String, dynamic>> _tools = [
+    {
+      "display": "Barbell",
+      "value": "barbell",
+    },
+    {"display": "Dumbbells/Kettlebells", "value": "dumbbell"},
+    {
+      "display": "Pullup-Bar",
+      "value": "pullupbar",
+    },
+    {
+      "display": "Cable Machine",
+      "value": "cable",
+    },
+    {
+      "display": "Dip Bars",
+      "value": "dipbars",
+    },
+    {
+      "display": "Fly Machine",
+      "value": "flymachine",
+    },
+  ];
+
   @override
   void initState() {
     super.initState();
     //Initial Values
     _typeController = TextEditingController(text: 'Gym');
-
   }
+
   @override
   void dispose() {
     _gymTypeFocusNode.dispose();
@@ -476,9 +530,10 @@ class _SetupPageState extends State<SetupPage> {
       _formIndex = newIndex;
     });
     newIndex == 0
-      ? FocusScope.of(context).requestFocus(_gymTypeFocusNode)
-      : FocusScope.of(context).requestFocus(_gymToolsFocusNode);
+        ? FocusScope.of(context).requestFocus(_gymTypeFocusNode)
+        : FocusScope.of(context).requestFocus(_gymToolsFocusNode);
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -511,40 +566,45 @@ class _SetupPageState extends State<SetupPage> {
                       child: Column(
                         children: <Widget>[
                           SelectFormField(
-                            controller: _typeController,
-                            icon: Icon(Icons.fitness_center),
-                            labelText: 'Gym Type',
-                            changeIcon: true,
-                            dialogTitle: 'Pick your gym type',
-                            items: _gyms,
-                            onChanged: (val) => setState(() => gymType = val),
-                            validator: (val) {
-                              setState(() {
-                                gymType = val;
-                              });
-                              return null;
-                            }
-                          ),
-                          RaisedButton(
-                            child: Text('Submit'),
-                            onPressed: () {
-                              final loForm = _formKey1.currentState;
-                              if (loForm.validate()) {
-                                loForm.save();
-                                if(gymType == 'homeGym') {
-                                  switchInputFields(1);
-                                } else {
-                                  //Save Form Data Here in CONFIG FILE
-                                  Config cfig = Config(gymType);
-                                  saveConfig(cfig);
-                                  Navigator.of(context).popUntil((route) => route.isFirst);
-                                  Navigator.pushReplacement(context,
-                                    MaterialPageRoute(builder: (context) => MyHomePage(title: "Home")),
-                                  );
+                              controller: _typeController,
+                              icon: Icon(Icons.fitness_center),
+                              labelText: 'Gym Type',
+                              changeIcon: true,
+                              dialogTitle: 'Pick your gym type',
+                              items: _gyms,
+                              onChanged: (val) => setState(() => gymType = val),
+                              validator: (val) {
+                                setState(() {
+                                  gymType = val;
+                                });
+                                if (gymType == '') {
+                                  return "Choose A Gym Type";
                                 }
-                              }
-                            }
-                          )
+                                return null;
+                              }),
+                          RaisedButton(
+                              child: Text('Submit'),
+                              onPressed: () {
+                                final loForm = _formKey1.currentState;
+                                if (loForm.validate()) {
+                                  loForm.save();
+                                  if (gymType == 'homeGym') {
+                                    switchInputFields(1);
+                                  } else {
+                                    //Save Form Data Here in CONFIG FILE
+                                    Config cfig = Config(gymType);
+                                    saveConfig(cfig);
+                                    Navigator.of(context)
+                                        .popUntil((route) => route.isFirst);
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              MyHomePage(title: "Home")),
+                                    );
+                                  }
+                                }
+                              })
                         ],
                       ),
                     ),
@@ -553,10 +613,60 @@ class _SetupPageState extends State<SetupPage> {
                 Container(
                   //Gym Tools
                   //Only show if They choose home gym in the past question
-
-
+                  padding: const EdgeInsets.all(10.0),
+                  color: Theme.of(context).accentColor,
+                  width: MediaQuery.of(context).size.width * 0.75,
+                  height: MediaQuery.of(context).size.height * .5,
+                  child: Card(
+                    child: Form(
+                        key: _formKey2,
+                        child: Column(
+                          children: <Widget>[
+                            MultiSelectFormField(
+                                autovalidate: false,
+                                title: Text("My Equipment"),
+                                dataSource: _tools,
+                                validator: (value) {
+                                  if (value == null || value.length == 0) {
+                                    return "Please select your equipment";
+                                  }
+                                  return null;
+                                },
+                                okButtonLabel: 'CONFIRM',
+                                cancelButtonLabel: 'CANCEL',
+                                hintWidget: Text(
+                                    'Please select any equipment you have'),
+                                initialValue: _gymTools,
+                                onSaved: (value) {
+                                  if (value == null) return;
+                                  setState(() {
+                                    _gymTools = value;
+                                  });
+                                }),
+                            RaisedButton(
+                              child: Text("DONE"),
+                              onPressed: () {
+                                final loForm = _formKey2.currentState;
+                                if (loForm.validate()) {
+                                  loForm.save();
+                                  Config cfig =
+                                      Config.withTools(gymType, _gymTools);
+                                  saveConfig(cfig);
+                                  Navigator.of(context)
+                                      .popUntil((route) => route.isFirst);
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            MyHomePage(title: "Home")),
+                                  );
+                                }
+                              },
+                            ),
+                          ],
+                        )),
+                  ),
                 ),
-                
               ],
             ),
           ),
@@ -564,6 +674,4 @@ class _SetupPageState extends State<SetupPage> {
       ),
     );
   }
-
-
 }

@@ -17,6 +17,7 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  multiselect_formfield: ^0.1.5
   select_form_field: "^1.1.0"
   path_provider: ^1.6.18
   flutter:

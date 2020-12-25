@@ -7,6 +7,8 @@ import 'dart:convert';
 class Config {
   String gymType;
   List<String> gymTools;
+  //Possible Tools:
+  //barbell, dumbbell, pullupbar, cable, dipbars, flymachine
 
   Config(this.gymType);
   Config.withTools(this.gymType, this.gymTools);
