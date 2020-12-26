@@ -44,26 +44,74 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
+  final String title;
+  @override
+  _MyHomePage createState() => _MyHomePage();
+}
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
+class _MyHomePage extends State<MyHomePage> {
+  int _currentIndex = 0;
+  Widget bodyWidget = new WorkoutCreatorPage();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          widget.title,
+        ),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.grey,
+            height: 4.0,
+          ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
+      ),
+      backgroundColor: Theme.of(context).primaryColor,
+      body: bodyWidget,
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: onTapBar,
+        currentIndex: _currentIndex,
+        items: [
+          new BottomNavigationBarItem(
+            icon: Icon(Icons.fitness_center),
+            label: "Workouts",
+          ),
+          new BottomNavigationBarItem(
+            icon: Icon(Icons.science),
+            label: "Research",
+          ),
+        ],
+      ),
+    );
+  }
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
+  void onTapBar(int index) {
+    if(index == 0) {
+      setState(() {
+        bodyWidget = new WorkoutCreatorPage();
+      });
+    } else if (index == 1) {
+      setState(() {
+        //TODO: New Research Page Widget
+        bodyWidget = Text("Research Tab Coming Soon", style: TextStyle( color: Colors.white ));
+      });
+    }
+  }
+}
+
+class WorkoutCreatorPage extends StatefulWidget {
+  WorkoutCreatorPage({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _WorkoutCreatorPage createState() => _WorkoutCreatorPage();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _WorkoutCreatorPage extends State<WorkoutCreatorPage> {
   Future<List<String>> _workouts = globals.getWorkouts();
   Future<bool> _configExists = configExists();
  
@@ -84,21 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       }
     });
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.title,
-        ),
-        bottom: PreferredSize(
-          child: Container(
-            color: Colors.grey,
-            height: 4.0,
-          ),
-          preferredSize: Size.fromHeight(4.0),
-        ),
-      ),
-      backgroundColor: Theme.of(context).primaryColor,
-      body:Container(
+    return Container(
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -174,8 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
-        ),
-    );
+        );
   }
 }
 
