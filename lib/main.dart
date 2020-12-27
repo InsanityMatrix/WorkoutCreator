@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:workoutcreator/config.dart';
+import 'package:workoutcreator/research.dart';
 import 'package:workoutcreator/globals.dart' as globals;
 import 'package:select_form_field/select_form_field.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
@@ -95,8 +96,7 @@ class _MyHomePage extends State<MyHomePage> {
       });
     } else if (index == 1) {
       setState(() {
-        //TODO: New Research Page Widget
-        bodyWidget = Text("Research Tab Coming Soon", style: TextStyle( color: Colors.white ));
+        bodyWidget = new ResearchHomePage();
       });
     }
   }
