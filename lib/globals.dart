@@ -162,6 +162,12 @@ Exercise RUSSIAN_TWISTS = new Exercise("Russian Twists", OBLIQUES, [ABS], ["cali
 Exercise LEG_LIFTS = new Exercise("Leg Lifts", ABS, null, ["calisthenics"]);
 Exercise CRUNCHES = new Exercise("Crunches", ABS, null, ["calisthenics"]);
 
+//Calisthenics
+Exercise INVERTED_ROWS = new Exercise("Inverted Rows", DELTOIDS, [LATS, RHOMBOIDS, BICEPS], ["calisthenics"]);
+Exercise BW_REAR_DELT_FLY = new Exercise("Bodyweight Rear Delt Fly", DELTOIDS, [RHOMBOIDS, TRAPEZIUS], ["calisthenics"]);
+Exercise PIKE_PRESS = new Exercise("Pike Press", DELTOIDS, [TRICEPS], ["calisthenics"]);
+Exercise INVERTED_SHRUGS = new Exercise("Inverted Shrugs", TRAPEZIUS, [], ["calisthenics"]);
+
 
 
 
@@ -173,13 +179,17 @@ List<Exercise> EXERCISES = [
   PRONE_LATERAL_RAISE, BENT_OVER_DUMBELL_ROW, BACK_SQUAT, FRONT_SQUAT,
   GOBLET_SQUAT, HIP_THRUSTS, LEG_CURL, LEG_EXTENSIONS, SQUEEZE_PRESS,
   PLATE_PRESS, RUSSIAN_TWISTS, LEG_LIFTS, CRUNCHES,STANDING_CALF_RAISE, 
-  SEATED_CALF_RAISE,
+  SEATED_CALF_RAISE, INVERTED_ROWS, BW_REAR_DELT_FLY, PIKE_PRESS, INVERTED_SHRUGS,
+  
 
 ];
 
 Workout createWorkout(String name, List<int> selectedMuscles, Config config) {
+  //Exercises Per Muscle Group
+  int epm = 3;
   if(config == null) {
     //TODO: There was an ERROR
+    config = Config("gym");
   }
   List<Exercise> finalList = [];
   List<Exercise> lowPriorityList = [];
@@ -217,26 +227,28 @@ Workout createWorkout(String name, List<int> selectedMuscles, Config config) {
       }
     }
     //If this case is true, timesPrimary will be less than 2
-    if(choices.length > 2) {
-      for(int k = 0; k < 2; k++) {
+    if(choices.length > epm) {
+      for(int k = 0; k < epm; k++) {
         Random random = new Random();
         int randomNumber = random.nextInt(choices.length);
         finalList.add(choices[randomNumber]);
         choices.removeAt(randomNumber);
       }
-    } else if(choices.length == 2) {
-      for(int k = 0; k < 2; k++) {
+    } else if(choices.length == epm) {
+      for(int k = 0; k < epm; k++) {
         finalList.add(choices[0]);
         choices.removeAt(0);
       }
-    } else if(choices.length == 1) {
-      finalList.add(choices[0]);
-      choices.removeAt(0);
+    } else if(choices.length < epm) {
+      for(int k = 0; k < choices.length;) {
+        finalList.add(choices[0]);
+        choices.removeAt(0); 
+      }
     }
     for(int k = 0; k < choices.length; k++) {
       backups.add(choices[k]);
     }
-    if(timesPrimary < 2) {
+    if(timesPrimary < epm) {
       choices = [];
       for(int j = 0; j < lowPriorityList.length; j++) {
         if(lowPriorityList[j].isPrimaryMuscle(selectedMuscles[i])) {
@@ -244,17 +256,19 @@ Workout createWorkout(String name, List<int> selectedMuscles, Config config) {
         }
       }
 
-      if(timesPrimary == 1) {
-        Random random = new Random();
-        if(choices.length != 0) {
-          int randomNumber = random.nextInt(choices.length);
-          finalList.add(choices[randomNumber]);
-          choices.removeAt(randomNumber);
+      if(timesPrimary > 0) {
+        for(int l = 0; l < timesPrimary; l++) {
+          Random random = new Random();
+          if(choices.length != 0) {
+            int randomNumber = random.nextInt(choices.length);
+            finalList.add(choices[randomNumber]);
+            choices.removeAt(randomNumber);
+          }
         }
       }
       if(timesPrimary == 0) {
         Random random = new Random();
-        for(int j = 0; j < 2; j++) {
+        for(int j = 0; j < epm; j++) {
           if(choices.length > 0) {
             int randomNumber = random.nextInt(choices.length);
             finalList.add(choices[randomNumber]);
