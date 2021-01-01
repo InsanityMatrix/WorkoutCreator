@@ -62,7 +62,7 @@ class _ResearchHomePage extends State<ResearchHomePage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            SetupPage(),
+                            SupplementsPage(),
                     )
                   );
                 }
@@ -105,7 +105,7 @@ class _SupplementsPage extends State<SupplementsPage> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                  builder: (context) => MyHomePage(title: "Home")),
+                  builder: (context) => MyHomePage(title: "Home", index: 1)),
             );
           },
         ),
@@ -122,7 +122,7 @@ class _SupplementsPage extends State<SupplementsPage> {
                 itemCount: supplements.length,
                 itemBuilder: (BuildContext ctxt, int index) {
                   String supplement = supplements[index];
-                  double width = MediaQuery.of(ctxt).size.width;
+                  double width = MediaQuery.of(ctxt).size.width /10 * 8;
                   return Container(
                     color: Colors.blue,
                     margin: EdgeInsets.only(top: 10),
@@ -145,9 +145,12 @@ class _SupplementsPage extends State<SupplementsPage> {
                           width: width * .25,
                           child: IconButton(
                             icon: Icon(Icons.arrow_right),
-                            iconSize: 25,
                             onPressed: () {
-                              //TODO: Supplement On Pressed
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                   builder: (context) => SupplementInfo(supplement: supplement,)),
+                              );
                             },
                           )
                         ),
@@ -156,6 +159,105 @@ class _SupplementsPage extends State<SupplementsPage> {
                   );
                 }
               )
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SupplementInfo extends StatefulWidget {
+  SupplementInfo({Key key, this.supplement}) : super(key: key);
+
+  final String supplement;
+  @override
+  _SupplementInfo createState() => _SupplementInfo();
+}
+
+class _SupplementInfo extends State<SupplementInfo> {
+  String supplement;
+
+  @override
+  void initState() {
+    super.initState();
+    supplement = widget.supplement;
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+       appBar: AppBar(
+        title: Text("Supplements",
+            style: Theme.of(context).textTheme.button),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.grey,
+            height: 4.0,
+          ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => SupplementsPage()),
+            );
+          },
+        ),
+      ),
+      body:Center(
+        child: ListView(
+          shrinkWrap: true,
+          padding: EdgeInsets.all(15.0),
+          children: [
+            //Need the Supplement Name First
+            Container(
+              color: Colors.blue,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    supplement,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 25,
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: "Times New Roman",
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Container(
+              color: Colors.grey[200],
+              padding: EdgeInsets.all(10),
+              child: FutureBuilder<String>(
+                future: getSupplementInfo(supplement),
+                builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                  Text info;
+                  if(snapshot.hasData) {
+                    if(snapshot.data == null) {
+                      info = Text("Something Went Wrong");
+                    } else {
+                      info = Text(
+                        snapshot.data,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: "Times New Roman",
+                          fontSize: 12,
+                        ),
+                      );
+                    }
+                  } else {
+                    info = Text("Something Went Wrong");
+                  }
+                  return info;
+                }
+              ),
             ),
           ],
         ),

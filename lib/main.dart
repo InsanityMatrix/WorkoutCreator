@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:workoutcreator/config.dart';
 import 'package:workoutcreator/research.dart';
+import 'package:workoutcreator/information.dart';
 import 'package:workoutcreator/globals.dart' as globals;
 import 'package:select_form_field/select_form_field.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
@@ -41,13 +42,14 @@ class MyApp extends StatelessWidget {
               color: Color(0xFFdbdbdb),
             )),
       ),
-      home: MyHomePage(title: 'Home'),
+      home: MyHomePage(title: 'Home', index: 0),
     );
   }
 }
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key key, this.title, this.index}) : super(key: key);
   final String title;
+  final int index;
   @override
   _MyHomePage createState() => _MyHomePage();
 }
@@ -55,6 +57,14 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePage extends State<MyHomePage> {
   int _currentIndex = 0;
   Widget bodyWidget = new WorkoutCreatorPage();
+  @override
+  void initState() {
+    super.initState();
+    setupResearch();
+    setState(() {
+      _currentIndex = widget.index;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -432,7 +442,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                  builder: (context) => MyHomePage(title: "Home")),
+                  builder: (context) => MyHomePage(title: "Home", index: 0)),
             );
           },
         ),
@@ -489,7 +499,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => MyHomePage(title: "Home")),
+                    builder: (context) => MyHomePage(title: "Home", index: 0)),
               );
             }
           });
@@ -647,7 +657,7 @@ class _SetupPageState extends State<SetupPage> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              MyHomePage(title: "Home")),
+                                              MyHomePage(title: "Home", index: 0)),
                                     );
                                   }
                                 }
@@ -709,7 +719,7 @@ class _SetupPageState extends State<SetupPage> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            MyHomePage(title: "Home")),
+                                            MyHomePage(title: "Home",index: 0)),
                                   );
                                 }
                               },
