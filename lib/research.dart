@@ -110,6 +110,7 @@ class _SupplementsPage extends State<SupplementsPage> {
           },
         ),
       ),
+      backgroundColor: Theme.of(context).primaryColor,
       body: Container(
         width: MediaQuery.of(context).size.width / 10 * 8,
         margin: EdgeInsets.only(left: MediaQuery.of(context).size.width / 10),
@@ -208,6 +209,7 @@ class _SupplementInfo extends State<SupplementInfo> {
           },
         ),
       ),
+      backgroundColor: Theme.of(context).primaryColor,
       body:Center(
         child: ListView(
           shrinkWrap: true,

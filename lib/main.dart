@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:workoutcreator/config.dart';
 import 'package:workoutcreator/research.dart';
 import 'package:workoutcreator/information.dart';
@@ -233,6 +234,7 @@ class WorkoutBuilderPage extends StatefulWidget {
 class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
   final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
+  final epmController = TextEditingController(text: '2');
   List<DropdownMenuItem<int>> muscleList = [];
   List<int> selectedMuscles = [];
   int muscleGroupButtons = 1;
@@ -307,6 +309,22 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                     contentPadding: EdgeInsets.all(20.0),
                   ),
                   controller: nameController,
+     
+                ),
+                Container(
+                  alignment: Alignment(0,0),
+                  width: MediaQuery.of(context).size.width,
+                  padding: EdgeInsets.only(left: 20, right: 20),
+                  child: TextField(
+                    decoration: new InputDecoration(labelText: "Exercises Per Muscle Group", labelStyle: TextStyle(color: Colors.white)),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    controller: epmController,
+                    style: Theme.of(context).textTheme.button,
+                    cursorColor: Colors.white,
+                  ),
                 ),
                 getMGBColumn(),
                 RaisedButton(
@@ -328,13 +346,15 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                   onPressed: () {
                     if (_formKey.currentState.validate()) {
                       String name = nameController.text;
+                      String epmString = epmController.text;
+                      int epm = int.parse(epmString);
                       List<int> muscleChoices = [];
                       for (int i = 0; i < muscleGroupButtons; i++) {
                         muscleChoices.add(selectedMuscles[i]);
                       }
 
                       globals.Workout workout =
-                          globals.createWorkout(name, muscleChoices, mainConfig);
+                          globals.createWorkout(name,epm, muscleChoices, mainConfig);
                       Navigator.of(context).popUntil((route) => route.isFirst);
                       Navigator.pushReplacement(
                         context,

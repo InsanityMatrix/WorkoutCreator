@@ -180,15 +180,13 @@ List<Exercise> EXERCISES = [
   GOBLET_SQUAT, HIP_THRUSTS, LEG_CURL, LEG_EXTENSIONS, SQUEEZE_PRESS,
   PLATE_PRESS, RUSSIAN_TWISTS, LEG_LIFTS, CRUNCHES,STANDING_CALF_RAISE, 
   SEATED_CALF_RAISE, INVERTED_ROWS, BW_REAR_DELT_FLY, PIKE_PRESS, INVERTED_SHRUGS,
-  
+
 
 ];
 
-Workout createWorkout(String name, List<int> selectedMuscles, Config config) {
+Workout createWorkout(String name,int epm, List<int> selectedMuscles, Config config) {
   //Exercises Per Muscle Group
-  int epm = 3;
   if(config == null) {
-    //TODO: There was an ERROR
     config = Config("gym");
   }
   List<Exercise> finalList = [];
@@ -468,7 +466,7 @@ Future<List<String>> getWorkouts() async {
   directory.list(recursive: false).forEach((f) {
     print("Path: " + f.path);
     String n = f.path.split("/").last;
-    if(n != "flutter_assets" && !n.startsWith("res_timestamp") && n != "config.json") {
+    if(checkWFileName(n)) {
           names.add(n.replaceAll(".json", ""));
     }
   });
@@ -476,6 +474,17 @@ Future<List<String>> getWorkouts() async {
   return names;
 }
 
+bool checkWFileName(String n) {
+  if(
+    n != "flutter_assets" &&
+    !n.startsWith("res_timestamp") &&
+    n != "config.json" &&
+    n != "research"
+  ) {
+    return true;
+  }
+  return false;
+}
 Future<Workout> getWorkout(String filename) async {
   Workout workout;
   final directory = await getApplicationDocumentsDirectory();
