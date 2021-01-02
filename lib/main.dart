@@ -80,6 +80,24 @@ class _MyHomePage extends State<MyHomePage> {
           ),
           preferredSize: Size.fromHeight(4.0),
         ),
+        //Settings
+        actions: <Widget> [
+          Padding(
+            padding: EdgeInsets.only(right: 20.0),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          SettingsPage(),
+                  ),
+                );
+              },
+              child: Icon(Icons.settings),
+            ),
+          )
+        ],
       ),
       backgroundColor: Theme.of(context).primaryColor,
       body: bodyWidget,

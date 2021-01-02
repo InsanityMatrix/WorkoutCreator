@@ -21,7 +21,7 @@ class _ResearchHomePage extends State<ResearchHomePage> {
       children: [
         sectionCreator("Supplementation", context),
         sectionCreator("Pre-Workouts", context),
-        sectionCreator("Gaining Muscle", context),
+        sectionCreator("Beginner Questions", context),
         sectionCreator("Strength Programs", context),
       ],
     );
@@ -34,7 +34,7 @@ class _ResearchHomePage extends State<ResearchHomePage> {
     return Container(
       alignment: Alignment.center,
       height: 50,
-      color: Colors.blue,
+      color: Theme.of(context).accentColor,
       padding: EdgeInsets.all(8),
       margin: EdgeInsets.only(left: margin, right: margin, top: 10, bottom: 10),
       width: width * 0.8,
@@ -63,6 +63,13 @@ class _ResearchHomePage extends State<ResearchHomePage> {
                     MaterialPageRoute(
                         builder: (context) =>
                             SupplementsPage(),
+                    )
+                  );
+                } else if (sectionName == "Beginner Questions") {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BeginnerQuestions(),
                     )
                   );
                 }
@@ -125,7 +132,7 @@ class _SupplementsPage extends State<SupplementsPage> {
                   String supplement = supplements[index];
                   double width = MediaQuery.of(ctxt).size.width /10 * 8;
                   return Container(
-                    color: Colors.blue,
+                    color: Theme.of(context).accentColor,
                     margin: EdgeInsets.only(top: 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -264,6 +271,119 @@ class _SupplementInfo extends State<SupplementInfo> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class BeginnerQuestions extends StatefulWidget {
+  BeginnerQuestions({Key key}) : super(key: key);
+
+  @override
+  _BeginnerQuestions createState() => _BeginnerQuestions();
+}
+class _BeginnerQuestions extends State<BeginnerQuestions> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Beginner Questions",
+            style: Theme.of(context).textTheme.button),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.grey,
+            height: 4.0,
+          ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.home, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MyHomePage(title: "Home", index: 1)),
+            );
+          },
+        ),
+      ),
+      backgroundColor: Theme.of(context).primaryColor,
+      body: FutureBuilder(
+        future: getQuestions(),
+        builder: (BuildContext context, AsyncSnapshot<List<Question>> snapshot) {
+          if(snapshot.hasData) {
+            if(snapshot.data == null) {
+              return Text("Something Went Wrong", style: TextStyle(color: Colors.white));
+            } else {
+              //Success
+              List<Question> questions = snapshot.data;
+              return ListView.builder(
+                itemCount: questions.length,
+                itemBuilder: (BuildContext ctxt, int index) {
+                  Question question = questions[index];
+                  double m = MediaQuery.of(ctxt).size.width / 10;
+                  return Container(
+                    color: Theme.of(context).accentColor,
+                    width: MediaQuery.of(ctxt).size.width / 10 * 8,
+                    margin: EdgeInsets.only(top: m / 2, left: m, right: m),
+                      child: ExpansionTile(
+                        backgroundColor: Theme.of(context).accentColor,
+                        title: buildTitle(ctxt, question.question),
+                        trailing: SizedBox(),
+                        children: <Widget>[
+                          Container(
+                            color: Colors.white,
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              question.answer,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                                fontFamily: "Times New Roman",
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                  );
+                }
+              );
+            }
+          } else {
+            return Text("Something Went Wrong", style: TextStyle(color: Colors.white));
+          }
+
+        }
+      )
+    );
+  }
+
+  Row buildTitle(BuildContext context, String question) {
+    double width = MediaQuery.of(context).size.width / 10 * 8 * .8 * .95;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Container(
+          width: width * .8,
+          child: Text(
+            question,
+            overflow: TextOverflow.visible,
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: "Times New Roman",
+              fontSize: 15,
+            ),
+          ),
+        ),
+        Container(
+          width: width * .2,
+          child: Icon(
+            Icons.menu,
+            color: Colors.white,
+            size: 15,
+          ),
+        ),
+      ],
     );
   }
 }

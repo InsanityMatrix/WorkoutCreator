@@ -1,5 +1,6 @@
 library workoutcreator.config;
-
+import 'package:flutter/material.dart';
+import 'package:workoutcreator/main.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:convert';
@@ -23,9 +24,19 @@ void saveConfig(Config config) async {
   final directory = await getApplicationDocumentsDirectory();
   final path = directory.path;
   final cName = "config.json";
-  File cFile = File('$path/$cName');
-  String json = jsonEncode(config);
-  cFile.writeAsString(json);
+  configExists().then((exists){
+    if(exists) {
+      File cFile = File('$path/$cName');
+      cFile.deleteSync();
+      cFile.create();
+      String json = jsonEncode(config);
+      cFile.writeAsString(json);
+    } else {
+      File cFile = File("$path/$cName");
+      String json = jsonEncode(config);
+      cFile.writeAsString(json);
+    }
+  });
 }
 
 Future<Config> getConfig() async {
@@ -54,4 +65,78 @@ Future<bool> configExists() async {
     return true;
   }
   return false;
+}
+
+
+class SettingsPage extends StatefulWidget {
+  SettingsPage({Key key}) : super(key: key);
+
+  @override
+  _SettingsPage createState() => _SettingsPage();
+}
+
+class _SettingsPage extends State<SettingsPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Settings",
+            style: Theme.of(context).textTheme.button),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.grey,
+            height: 4.0,
+          ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.home, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MyHomePage(title: "Home", index: 0)),
+            );
+          },
+        ),
+      ),
+      backgroundColor: Theme.of(context).primaryColor,
+      body: Column(
+        children: <Widget>[
+          Container(
+            width: MediaQuery.of(context).size.width * .9,
+            margin: EdgeInsets.all(MediaQuery.of(context).size.width * .05),
+            child: FlatButton(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+                side: BorderSide(color: Colors.red),
+              ),
+              color: Theme.of(context).accentColor,
+              onPressed: () {
+                //Setup New Config
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          SetupPage(),
+                  )
+                );
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    child: Icon(Icons.note, size: 20.00),
+                    margin: EdgeInsets.only(right: 10),
+                  ),
+                  Text("Change Equipment", style: TextStyle(color: Colors.white)),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
