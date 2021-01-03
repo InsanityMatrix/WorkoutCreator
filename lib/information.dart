@@ -35,7 +35,11 @@ void setupResearch() async {
       File qFile = File('$path/research/Questions.txt');
       qFile.writeAsString(val);
     });
-
+    //Download StrengthPrograms
+    getStrengthProgramsFile().then((val) {
+      File spFile = File('$path/research/StrengthPrograms.txt');
+      spFile.writeAsString(val);
+    });
 
   } else {
     //Make Sure every file exists
@@ -60,6 +64,14 @@ void setupResearch() async {
         qFile.writeAsString(val);
       });
     }
+    //StrengthPrograms File
+    File spFile = File('$path/research/StrengthPrograms.txt');
+    exists = await spFile.exists();
+    if(!exists) {
+      getStrengthProgramsFile().then((val) {
+        spFile.writeAsString(val);
+      });
+    }
   }
 }
 
@@ -75,6 +87,11 @@ Future<String> getSupplementFile(String supplement) async {
 }
 Future<String> getQuestionsFile() async {
   String urlP = url + 'Questions';
+  var response = await http.get(urlP);
+  return response.body;
+}
+Future<String> getStrengthProgramsFile() async {
+  String urlP = url + 'StrengthPrograms';
   var response = await http.get(urlP);
   return response.body;
 }
@@ -116,4 +133,33 @@ Future<List<Question>> getQuestions() async {
   });
 
   return questions;
+}
+class StrengthProgram {
+  String name, link, difficulty;
+  StrengthProgram(this.name, this.link, this.difficulty);
+
+  Map<String, String> toJson() => {
+    'Name': name,
+    'Link': link,
+    'Difficulty': difficulty,
+  };
+}
+Future<List<StrengthProgram>> getStrengthPrograms() async {
+  List<StrengthProgram> programs = [];
+  final directory = await getApplicationDocumentsDirectory();
+  final path = directory.path;
+  File qFile = File('$path/research/StrengthPrograms.txt');
+  String json = await qFile.readAsString();
+  var decoded = jsonDecode(json);
+  //print(decoded);
+  decoded.forEach((q) {
+    String name = q['Name'];
+    String link = q['Link'];
+    String difficulty = q['Difficulty'];
+
+    StrengthProgram p = StrengthProgram(name,link,difficulty);
+    programs.add(p);
+  });
+
+  return programs;
 }

@@ -127,7 +127,7 @@ class _SettingsPage extends State<SettingsPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Container(
-                    child: Icon(Icons.note, size: 20.00),
+                    child: Icon(Icons.note, size: 20.00, color: Colors.white),
                     margin: EdgeInsets.only(right: 10),
                   ),
                   Text("Change Equipment", style: TextStyle(color: Colors.white)),

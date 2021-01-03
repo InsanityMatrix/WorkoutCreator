@@ -30,6 +30,7 @@ class Workout {
       this.exercises[index] = replacements[0];
       int oIndex = this.backups.indexOf(replacements[0]);
       this.backups[oIndex] = temp;
+      saveWorkout(this);
       return;
     } else {
       Random random = new Random();
@@ -38,8 +39,10 @@ class Workout {
       this.exercises[index] = replacement;
       int oIndex = this.backups.indexOf(replacement);
       this.backups[oIndex] = temp;
+      saveWorkout(this);
       return;
     }
+    
   }
 
   Map<String, dynamic> toJson() => {
@@ -139,6 +142,8 @@ Exercise W_Raise = new Exercise("W-Raise", DELTOIDS, [TRAPEZIUS], ["dumbbell"]);
 Exercise TRICEP_KICKBACK = new Exercise("Tricep Kickback", TRICEPS, null, ["dumbbell"]);
 Exercise SKULL_CRUSHERS = new Exercise("Skullcrushers", TRICEPS, null, ["barbell","dumbbell"]);
 Exercise HAMMER_CURL = new Exercise("Hammer Curls", BICEPS, null, ["dumbbell"]);
+Exercise INCLINE_DUMBBELL_CURL = new Exercise("Incline Dumbbell Curl", BICEPS, null, ["dumbbell"]);
+Exercise SPIDER_CURLS = new Exercise("Spider Curls", BICEPS, null, ["dumbbell"]);
 Exercise CHEST_FLY = new Exercise("Chest Fly", CHEST, [DELTOIDS], ["flymachine","dumbbell"]);
 Exercise PRONE_LATERAL_RAISE = new Exercise("Prone Lateral Raise", RHOMBOIDS, null, ["dumbbell"]);
 Exercise BENT_OVER_DUMBELL_ROW = new Exercise("Bent Over Dumbell Row", RHOMBOIDS, [DELTOIDS, TRAPEZIUS, LATS], ["dumbbell"]);
@@ -146,14 +151,19 @@ Exercise SQUEEZE_PRESS = new Exercise("Squeeze Press", CHEST, [TRICEPS], ["dumbb
 Exercise PLATE_PRESS = new Exercise("Plate Press", CHEST, [TRICEPS], ["barbell"]);
 Exercise PUSHUPS = new Exercise("Pushups", CHEST, [TRICEPS], ["calisthenics"]);
 //Lower Body
-Exercise DEADLIFT = new Exercise("Deadlift", GLUTES, [QUADS, LATS, TRAPEZIUS], ["barbell"]);
+Exercise DEADLIFT = new Exercise("Deadlift", GLUTES, [QUADS, LATS, TRAPEZIUS], ["barbell", "dumbbell"]);
+Exercise ROMANIAN_DEADLIFT = new Exercise("Romanian Deadlifts", HAMSTRINGS, [GLUTES, QUADS], ["barbell","dumbbell"]);
 Exercise BACK_SQUAT = new Exercise("Back Squat", GLUTES, [HAMSTRINGS, QUADS], ["barbell"]);
 Exercise FRONT_SQUAT = new Exercise("Front Squat", QUADS, [ABS, GLUTES, HAMSTRINGS], ["barbell"]);
 Exercise GOBLET_SQUAT = new Exercise("Goblet Squat", QUADS, [CALVES, GLUTES, ABS, HAMSTRINGS], ["dumbbell"]);
 Exercise HIP_THRUSTS = new Exercise("Hip Thrust", GLUTES, null, ["barbell"]);
+Exercise BULGARIAN_SPLIT_SQUATS = new Exercise("Bulgarian Split Squats", QUADS, [GLUTES, HAMSTRINGS, CALVES], ["dumbbell", "barbell"]);
+Exercise SINGLE_LEG_DEADLIFT = new Exercise("Single Leg Deadlift", GLUTES, [QUADS], ["dumbbell"]);
+Exercise LUNGES = new Exercise("Dumbbell Lunges", QUADS, [GLUTES, HAMSTRINGS], ["dumbbell"]);
+Exercise LATERAL_LUNGES = new Exercise("Lateral Lunge", GLUTES, [QUADS], ["dumbbell", "calisthenics"]);
 //TODO: Add this equipment
-Exercise LEG_CURL = new Exercise("Leg Curl", HAMSTRINGS, [CALVES], []);
-Exercise LEG_EXTENSIONS = new Exercise("Leg Extensions", QUADS, null, []);
+Exercise LEG_CURL = new Exercise("Leg Curl", HAMSTRINGS, [CALVES], ["legmachine"]);
+Exercise LEG_EXTENSIONS = new Exercise("Leg Extensions", QUADS, null, ["legmachine"]);
 
 Exercise STANDING_CALF_RAISE = new Exercise("Standing Calf Raise", CALVES, null, ["barbell", "dumbbell","calisthenics"]);
 Exercise SEATED_CALF_RAISE = new Exercise("Seated Calf Raise", CALVES, null, ["dumbbell"]);
@@ -167,7 +177,7 @@ Exercise INVERTED_ROWS = new Exercise("Inverted Rows", DELTOIDS, [LATS, RHOMBOID
 Exercise BW_REAR_DELT_FLY = new Exercise("Bodyweight Rear Delt Fly", DELTOIDS, [RHOMBOIDS, TRAPEZIUS], ["calisthenics"]);
 Exercise PIKE_PRESS = new Exercise("Pike Press", DELTOIDS, [TRICEPS], ["calisthenics"]);
 Exercise INVERTED_SHRUGS = new Exercise("Inverted Shrugs", TRAPEZIUS, [], ["calisthenics"]);
-
+Exercise HANGING_LEG_LIFTS = new Exercise("Hanging Leg Lifts", ABS, [], ["pullupbar", "calisthenics"]);
 
 
 
@@ -180,8 +190,8 @@ List<Exercise> EXERCISES = [
   GOBLET_SQUAT, HIP_THRUSTS, LEG_CURL, LEG_EXTENSIONS, SQUEEZE_PRESS,
   PLATE_PRESS, RUSSIAN_TWISTS, LEG_LIFTS, CRUNCHES,STANDING_CALF_RAISE, 
   SEATED_CALF_RAISE, INVERTED_ROWS, BW_REAR_DELT_FLY, PIKE_PRESS, INVERTED_SHRUGS,
-
-
+  BULGARIAN_SPLIT_SQUATS,SINGLE_LEG_DEADLIFT, LUNGES, LATERAL_LUNGES,INCLINE_DUMBBELL_CURL,SPIDER_CURLS,
+  ROMANIAN_DEADLIFT, HANGING_LEG_LIFTS,
 ];
 
 Workout createWorkout(String name,int epm, List<int> selectedMuscles, Config config) {
@@ -200,7 +210,6 @@ Workout createWorkout(String name,int epm, List<int> selectedMuscles, Config con
       }
     }
   }
-  print("Low Priority " + lowPriorityList.toString());
   for(int i = 0; i < selectedMuscles.length; i++) {
     for(int j = 0; j < lowPriorityList.length; j++) {
       if(lowPriorityList[j].containsSecondaryMuscle(selectedMuscles[i])) {
@@ -212,8 +221,19 @@ Workout createWorkout(String name,int epm, List<int> selectedMuscles, Config con
   }
   //Remove duplicates from list
   highPriorityList = highPriorityList.toSet().toList();
-  print("New Low Priority " + lowPriorityList.toString());
-  print("High Priority " + highPriorityList.toString());
+  //Move all calisthenics workouts to lowPriority List unless this is a calisthenics configuration
+  if(config.gymType != "park") {
+    List<Exercise> toMove = [];
+    highPriorityList.forEach((ex) {
+      if(ex.equipment.length == 1 && ex.equipment[0] == "calisthenics") {
+        toMove.add(ex);
+      }
+    });
+    toMove.forEach((ex) {
+      highPriorityList.remove(ex);
+      lowPriorityList.add(ex);
+    });
+  }
   //Check if there are two exercises with a selected muscle as primary for every single muscle selected
   for(int i = 0; i < selectedMuscles.length; i++) {
     List<Exercise> choices = [];
@@ -438,6 +458,13 @@ Workout createWorkout(String name,int epm, List<int> selectedMuscles, Config con
       backups.remove(toRemoveB[i]);
     }
   }
+
+  //Go through and make sure that there are no repeats
+  finalList.forEach((exercise) {
+    if(backups.contains(exercise)) {
+      backups.remove(exercise);
+    }
+  });
   print("Final List: " + finalList.toString());
   Workout workout = new Workout.withBackups(name, finalList,backups);
   saveWorkout(workout);
@@ -448,9 +475,13 @@ void saveWorkout(Workout workout) async {
   final path = directory.path;
   final wName = workout.getName() + ".json";
   File wFile = File('$path/$wName');
+  bool exist = await wFile.exists();
+  if(exist) {
+    await wFile.delete();
+  }
+  File cFile = await wFile.create();
   String json = jsonEncode(workout);
-  print(json);
-  wFile.writeAsString(json);
+  cFile.writeAsString(json);
 }
 Future<bool> removeWorkout(String name) async {
   final directory = await getApplicationDocumentsDirectory();
@@ -464,13 +495,11 @@ Future<List<String>> getWorkouts() async {
   final directory = await getApplicationDocumentsDirectory();
   List<String> names = [];
   directory.list(recursive: false).forEach((f) {
-    print("Path: " + f.path);
     String n = f.path.split("/").last;
     if(checkWFileName(n)) {
           names.add(n.replaceAll(".json", ""));
     }
   });
-  print(names.toString());
   return names;
 }
 

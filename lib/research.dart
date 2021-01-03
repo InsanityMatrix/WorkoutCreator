@@ -3,6 +3,7 @@ library workoutcreator.research;
 import 'package:flutter/material.dart';
 import 'package:workoutcreator/main.dart';
 import 'package:workoutcreator/information.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ResearchHomePage extends StatefulWidget {
   ResearchHomePage({Key key}) : super(key: key);
@@ -56,7 +57,6 @@ class _ResearchHomePage extends State<ResearchHomePage> {
                 color: Colors.white
               ),
               onPressed: () {
-                //TODO: Navigate to a page about this topic
                 if(sectionName == "Supplementation") {
                   Navigator.pushReplacement(
                     context,
@@ -70,6 +70,20 @@ class _ResearchHomePage extends State<ResearchHomePage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => BeginnerQuestions(),
+                    )
+                  );
+                } else if (sectionName == "Pre-Workouts") {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PreworkoutsPage(),
+                    )
+                  );
+                } else if (sectionName == "Strength Programs") {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProgramsPage(),
                     )
                   );
                 }
@@ -384,6 +398,213 @@ class _BeginnerQuestions extends State<BeginnerQuestions> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class PreworkoutsPage extends StatefulWidget {
+  PreworkoutsPage({Key key}) : super(key: key);
+
+  @override
+  _PreworkoutsPage createState() => _PreworkoutsPage();
+}
+class _PreworkoutsPage extends State<PreworkoutsPage> {
+  //Will be constructed a lot like the Beginner Questions Page
+  //Use expandable cards
+  @override
+  Widget build(BuildContext context) {
+    double m = MediaQuery.of(context).size.width / 10;
+    return Scaffold(
+       appBar: AppBar(
+        title: Text("Pre-Workouts",
+            style: Theme.of(context).textTheme.button),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.grey,
+            height: 4.0,
+          ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.home, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MyHomePage(title: "Home", index: 1)),
+            );
+          },
+        ),
+      ),
+      backgroundColor: Theme.of(context).primaryColor,
+      body: ListView(
+        children: <Widget>[
+          Container(
+            color: Theme.of(context).accentColor,
+            width: MediaQuery.of(context).size.width * .8,
+            margin: EdgeInsets.only(top: m /2, left: m, right: m),
+            child: ExpansionTile(
+              backgroundColor: Theme.of(context).accentColor,
+              title: buildTitle(context, "What to look for?"),
+              trailing: SizedBox(),
+              children: <Widget>[
+                Container(
+                  color: Colors.white,
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "In Pre-Workouts, typically companies will use filler supplements to make their formula look more full, or just to make you feel something. " +
+                    "Some of these filler ingredients may be low doses of Beta-Alanine, or Citrulline Malate. (L-)Citrulline is a desired ingredients in preworkouts, however when companies write Citrulline Malate they are mixing it with Malic Acid, making the dosage of citrulline on the label \'incorrect\' and saving the company money.  A lot of pre-workouts will have low doses of good supplements, which doesn't effectively give the most efficient results, look for a Pre-workout with good dosing for good results.",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontFamily: "Times New Roman",
+                    ),
+                  ),
+                )
+              ]
+            ),
+          ),
+          Container(
+            color: Theme.of(context).accentColor,
+            width: MediaQuery.of(context).size.width * .8,
+            margin: EdgeInsets.only(top: m /2, left: m, right: m),
+            child: ExpansionTile(
+              backgroundColor: Theme.of(context).accentColor,
+              title: buildTitle(context, "Recommended Pre-Workouts"),
+              trailing: SizedBox(),
+              children: <Widget>[
+                Container(
+                  color: Colors.white,
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "Gorilla Mode: Gorilla Mode is a pump and energy focused pre-workout that has no filler ingredients and good doses of supplements, so you don\'t need to buy many additional supplements.\n" +
+                    "Crack Preworkout: This high stim preworkout is a decent pre-workout that has lots of caffiene and a decent amount of other supplements, however it does contain Beta-Alanine at not the most potent dose, so it will make your skin crawl.\n",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontFamily: "Times New Roman",
+                    ),
+                  ),
+                )
+              ]
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Row buildTitle(BuildContext context, String title) {
+    double width = MediaQuery.of(context).size.width / 10 * 8 * .8 * .95;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Container(
+          width: width * .8,
+          child: Text(
+            title,
+            overflow: TextOverflow.visible,
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: "Times New Roman",
+              fontSize: 15,
+            ),
+          ),
+        ),
+        Container(
+          width: width * .2,
+          child: Icon(
+            Icons.menu,
+            color: Colors.white,
+            size: 15,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ProgramsPage extends StatefulWidget {
+  ProgramsPage({Key key}) : super(key: key);
+
+  @override
+  _ProgramsPage createState() => _ProgramsPage();
+}
+class _ProgramsPage extends State<ProgramsPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Strength Programs",
+            style: Theme.of(context).textTheme.button),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.grey,
+            height: 4.0,
+          ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.home, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MyHomePage(title: "Home", index: 1)),
+            );
+          },
+        ),
+      ),
+      backgroundColor: Theme.of(context).primaryColor,
+      body: FutureBuilder(
+        future: getStrengthPrograms(),
+        builder: (BuildContext context, AsyncSnapshot<List<StrengthProgram>> snapshot) {
+          if(snapshot.hasData) {
+            if(snapshot.data == null) {
+              return Text("Something Went Wrong", style: TextStyle(color: Colors.white));
+            } else {
+              //Success
+              List<StrengthProgram> programs = snapshot.data;
+              return ListView.builder(
+                itemCount: programs.length,
+                itemBuilder: (BuildContext ctxt, int index) {
+                  StrengthProgram program = programs[index];
+                  double m = MediaQuery.of(ctxt).size.width / 10;
+                  return Container(
+                    color: Theme.of(context).accentColor,
+                    width: MediaQuery.of(ctxt).size.width / 10 * 8,
+                    margin: EdgeInsets.only(top: m / 2, left: m, right: m),
+                    child: FlatButton(
+                      color: Theme.of(context).accentColor,
+                      child: Text(
+                        program.name,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: "Times New Roman",
+                          fontSize: 25,
+                        ),
+                      ),
+                      onPressed: () async {
+                        if(await canLaunch(program.link)) {
+                          await launch(program.link);
+                        } else {
+                          String link = program.link;
+                          throw 'Could not launch $link';
+                        }
+                      },
+                    ),
+                  );
+                }
+              );
+            }
+          } else {
+            return Text("Something Went Wrong", style: TextStyle(color: Colors.white));
+          }
+
+        }
+      )
     );
   }
 }
