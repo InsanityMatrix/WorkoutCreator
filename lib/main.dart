@@ -383,6 +383,9 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                   child: TextField(
                     decoration: new InputDecoration(labelText: "Exercises Per Muscle Group", labelStyle: TextStyle(color: Colors.white)),
                     keyboardType: TextInputType.number,
+                    onChanged: (val) {
+                      FocusScope.of(context).unfocus();
+                    },
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly
                     ],
