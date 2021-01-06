@@ -384,7 +384,14 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                     decoration: new InputDecoration(labelText: "Exercises Per Muscle Group", labelStyle: TextStyle(color: Colors.white)),
                     keyboardType: TextInputType.number,
                     onChanged: (val) {
-                      FocusScope.of(context).unfocus();
+                      if(val == "") {
+                        return;
+                      }
+                      int value = int.parse(val);
+                      if(value > 0) {
+                        FocusScope.of(context).unfocus();
+                      }
+
                     },
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly
@@ -409,6 +416,23 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                 RaisedButton(
                   color: Theme.of(context).accentColor,
                   focusColor: Color(0xFF525252),
+                  child: Text("Remove Last Muscle (group)",
+                    style: Theme.of(context).textTheme.button
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      muscleGroupButtons -= 1;
+                      List<int> newSM = [];
+                      for(int i = 0; i < selectedMuscles.length - 1; i++) {
+                        newSM.add(selectedMuscles[i]);
+                      }
+                      selectedMuscles = newSM;
+                    });
+                  },
+                ),
+                RaisedButton(
+                  color: Theme.of(context).accentColor,
+                  focusColor: Color(0xFF525252),
                   child: Text("Create Workout",
                       style: Theme.of(context).textTheme.button),
                   onPressed: () {
@@ -416,6 +440,9 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                       String name = nameController.text;
                       String epmString = epmController.text;
                       int epm = int.parse(epmString);
+                      if(epm == 0) {
+                        epm = 1;
+                      }
                       List<int> muscleChoices = [];
                       for (int i = 0; i < muscleGroupButtons; i++) {
                         muscleChoices.add(selectedMuscles[i]);

@@ -132,6 +132,8 @@ Exercise SHOULDER_PRESS = new Exercise("Shoulder Press", DELTOIDS, [TRAPEZIUS, T
 Exercise DIPS = new Exercise("Dips", TRICEPS, [CHEST, DELTOIDS, RHOMBOIDS], ["dipbars", "calisthenics"]);
 Exercise CONCENTRATION_CURLS = new Exercise("Concentration Curls", BICEPS, null, ["dumbbell"]);
 Exercise BENT_OVER_BARBELL_ROW = new Exercise("Bent over barbell row", DELTOIDS, [TRAPEZIUS, LATS, RHOMBOIDS, BICEPS], ["barbell"]);
+Exercise DUMBBELL_PULLOVERS = new Exercise("Dumbbell Pullovers", LATS, [CHEST, TRICEPS], ["dumbbells"]);
+
 Exercise LATERAL_RAISES = new Exercise("Lateral Raises", DELTOIDS, [TRAPEZIUS], ["dumbbell"]);
 Exercise PULLUPS = new Exercise("Pullups", LATS, [TRAPEZIUS, RHOMBOIDS, BICEPS], ["pullupbar", "calisthenics"]);
 Exercise CHINUPS = new Exercise("Chinups", BICEPS, [LATS, DELTOIDS,], ["pullupbar", "calisthenics"]);
@@ -161,7 +163,6 @@ Exercise BULGARIAN_SPLIT_SQUATS = new Exercise("Bulgarian Split Squats", QUADS, 
 Exercise SINGLE_LEG_DEADLIFT = new Exercise("Single Leg Deadlift", GLUTES, [QUADS], ["dumbbell"]);
 Exercise LUNGES = new Exercise("Dumbbell Lunges", QUADS, [GLUTES, HAMSTRINGS], ["dumbbell"]);
 Exercise LATERAL_LUNGES = new Exercise("Lateral Lunge", GLUTES, [QUADS], ["dumbbell", "calisthenics"]);
-//TODO: Add this equipment
 Exercise LEG_CURL = new Exercise("Leg Curl", HAMSTRINGS, [CALVES], ["legmachine"]);
 Exercise LEG_EXTENSIONS = new Exercise("Leg Extensions", QUADS, null, ["legmachine"]);
 
@@ -191,7 +192,7 @@ List<Exercise> EXERCISES = [
   PLATE_PRESS, RUSSIAN_TWISTS, LEG_LIFTS, CRUNCHES,STANDING_CALF_RAISE, 
   SEATED_CALF_RAISE, INVERTED_ROWS, BW_REAR_DELT_FLY, PIKE_PRESS, INVERTED_SHRUGS,
   BULGARIAN_SPLIT_SQUATS,SINGLE_LEG_DEADLIFT, LUNGES, LATERAL_LUNGES,INCLINE_DUMBBELL_CURL,SPIDER_CURLS,
-  ROMANIAN_DEADLIFT, HANGING_LEG_LIFTS,
+  ROMANIAN_DEADLIFT, HANGING_LEG_LIFTS, DUMBBELL_PULLOVERS,
 ];
 
 Workout createWorkout(String name,int epm, List<int> selectedMuscles, Config config) {
