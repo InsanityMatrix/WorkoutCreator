@@ -76,8 +76,8 @@ void setupResearch() async {
 }
 
 List<String> supplements = [
-  "Creatine", "L-Citrulline", "Glycerol", "Beta-Alanine",
-  "Caffiene"
+  "Creatine", "Ashwagandha", "L-Citrulline", "Glycerol", "Beta-Alanine",
+  "Caffiene", "Theacrine",
 ];
 
 Future<String> getSupplementFile(String supplement) async {

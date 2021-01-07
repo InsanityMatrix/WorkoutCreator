@@ -67,6 +67,21 @@ class _MyHomePage extends State<MyHomePage> {
     setState(() {
       _currentIndex = widget.index;
     });
+    configExists().then((bool data) {
+      if(!data) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  SetupPage(),
+          )
+        );
+      } else {
+        getConfig().then((Config config) {
+          mainConfig = config;
+        });
+      }
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -165,21 +180,6 @@ class _WorkoutCreatorPage extends State<WorkoutCreatorPage> {
   @override
   void initState() {
     super.initState();
-    configExists().then((bool data) {
-      if(!data) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  SetupPage(),
-          )
-        );
-      } else {
-        getConfig().then((Config config) {
-          mainConfig = config;
-        });
-      }
-    });
   }
   @override
   Widget build(BuildContext context) {
