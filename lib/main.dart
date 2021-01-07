@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:workoutcreator/config.dart';
 import 'package:workoutcreator/research.dart';
 import 'package:workoutcreator/information.dart';
+import 'package:workoutcreator/log.dart';
 import 'package:workoutcreator/globals.dart' as globals;
 import 'package:select_form_field/select_form_field.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
@@ -62,6 +63,7 @@ class _MyHomePage extends State<MyHomePage> {
   void initState() {
     super.initState();
     setupResearch();
+    setupLog();
     setState(() {
       _currentIndex = widget.index;
     });
@@ -70,8 +72,10 @@ class _MyHomePage extends State<MyHomePage> {
   Widget build(BuildContext context) {
     if(_currentIndex == 0) {
       bodyWidget = new WorkoutCreatorPage();
-    } else {
+    } else if(_currentIndex == 1) {
       bodyWidget = new ResearchHomePage();
+    } else if(_currentIndex == 2) {
+      bodyWidget = new LogHome();
     }
     return Scaffold(
       appBar: AppBar(
@@ -118,6 +122,10 @@ class _MyHomePage extends State<MyHomePage> {
             icon: Icon(Icons.science),
             label: "Research",
           ),
+          new BottomNavigationBarItem(
+            icon: Icon(Icons.book),
+            label: "Logs",
+          ),
         ],
       ),
     );
@@ -133,6 +141,11 @@ class _MyHomePage extends State<MyHomePage> {
       setState(() {
         bodyWidget = new ResearchHomePage();
         _currentIndex = 1;
+      });
+    } else if (index == 2) {
+      setState(() {
+        bodyWidget = new LogHome();
+        _currentIndex = 2;
       });
     }
   }

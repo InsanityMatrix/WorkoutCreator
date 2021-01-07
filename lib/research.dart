@@ -343,7 +343,7 @@ class _BeginnerQuestions extends State<BeginnerQuestions> {
                       child: ExpansionTile(
                         backgroundColor: Theme.of(context).accentColor,
                         title: buildTitle(ctxt, question.question),
-                        trailing: SizedBox(),
+                        trailing: SizedBox( width: 0),
                         children: <Widget>[
                           Container(
                             color: Colors.white,

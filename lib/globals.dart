@@ -509,7 +509,8 @@ bool checkWFileName(String n) {
     n != "flutter_assets" &&
     !n.startsWith("res_timestamp") &&
     n != "config.json" &&
-    n != "research"
+    n != "research" &&
+    n != "logs"
   ) {
     return true;
   }
