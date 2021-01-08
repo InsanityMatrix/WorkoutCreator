@@ -33,15 +33,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Workout Creator',
       theme: ThemeData(
-        primaryColor: Colors.black,
+        primaryColor: new Color(0xFF231330),
         primarySwatch: primaryBlack,
-        accentColor: new Color(0xFF424242),
+        accentColor: new Color(0xFF243254),
         textTheme: TextTheme(
             button: TextStyle(
               color: Colors.white,
             ),
             subtitle1: TextStyle(
-              color: Color(0xFFdbdbdb),
+              color: Color(0xFFFFFFFF),
             )),
       ),
       home: MyHomePage(title: 'Home', index: 0),
