@@ -159,7 +159,7 @@ class _MyHomePage extends State<MyHomePage> {
       });
     } else if (index == 2) {
       setState(() {
-        bodyWidget = new LogHome();
+        bodyWidget = new LogHome(setState: true);
         _currentIndex = 2;
       });
     }

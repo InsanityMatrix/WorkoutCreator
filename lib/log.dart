@@ -5,6 +5,7 @@ import 'package:workoutcreator/globals.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 
 bool isNumeric(String s) {
@@ -236,22 +237,37 @@ Future<void> removeFromPRLog(PRLog entry) async {
 }
 //GO: Views
 class LogHome extends StatefulWidget {
-  LogHome({Key key}) : super(key: key);
+  LogHome({Key key, this.setState}) : super(key: key);
 
+  bool setState;
   @override
   _LogHome createState() => _LogHome();
 }
 class _LogHome extends State<LogHome> {
   Future<List<PersonalLog>> personalLog;
   Future<List<PRLog>> prLog;
+  void rebuildAllChildren(BuildContext context) {
+    void rebuild(Element el) {
+      el.markNeedsBuild();
+      el.visitChildren(rebuild);
+    }
+    (context as Element).visitChildren(rebuild);
+  }
   @override
   void initState() {
     super.initState();
     personalLog = getPersonalLog();
     prLog = getPRLog();
+    if(widget.setState != null) {
+      setState((){
+        prLog = getPRLog();
+        personalLog = getPersonalLog();
+      });
+    }
   }
   @override
   Widget build(BuildContext context) {
+    rebuildAllChildren(context);
     return Container(
       child: ListView(
         children: <Widget>[
@@ -263,11 +279,11 @@ class _LogHome extends State<LogHome> {
   }
 
   Container loadPRLog(BuildContext context) {
-    double m = MediaQuery.of(context).size.width / 10;
+    double m = MediaQuery.of(context).size.width / 20;
     return Container(
       color: Theme.of(context).accentColor,
-      width: MediaQuery.of(context).size.width / 10 * 8,
-      margin: EdgeInsets.only(top: m/2, left: m, right: m),
+      width: MediaQuery.of(context).size.width / 10 * 9,
+      margin: EdgeInsets.only(top: m, left: m, right: m),
       child: FutureBuilder<List<PRLog>>(
         future: prLog,
         builder: (BuildContext ctxt, AsyncSnapshot<List<PRLog>> snapshot) {
@@ -278,7 +294,7 @@ class _LogHome extends State<LogHome> {
               List<PRLog> log = snapshot.data;
               List<Container> rows = [];
               log.forEach((entry) {
-                double rowWidth = MediaQuery.of(context).size.width * .8;
+                double rowWidth = MediaQuery.of(context).size.width * .9;
                 Container newRow = Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -289,7 +305,7 @@ class _LogHome extends State<LogHome> {
                   child: Row(
                     children: [
                       Container(
-                        width: rowWidth * .2,
+                        width: rowWidth * .3,
                         alignment: Alignment.center,
                         child: Text(
                           entry.exercise.name,
@@ -300,7 +316,7 @@ class _LogHome extends State<LogHome> {
                         ),
                       ),
                       Container(
-                        width: rowWidth * .3,
+                        width: rowWidth * .2,
                         alignment: Alignment.center,
                         child: Text(
                           entry.weight.toString() + entry.unit,
@@ -391,10 +407,10 @@ class _LogHome extends State<LogHome> {
 
   
   Container loadPersonalLog(BuildContext context) {
-    double m = MediaQuery.of(context).size.width / 10;
+    double m = MediaQuery.of(context).size.width / 20;
     return Container(
       color: Theme.of(context).accentColor,
-      width: MediaQuery.of(context).size.width / 10 * 8,
+      width: MediaQuery.of(context).size.width / 10 * 9,
       margin: EdgeInsets.only(top: m/2, left: m, right: m),
       child: FutureBuilder<List<PersonalLog>>(
         future: personalLog,
@@ -409,7 +425,7 @@ class _LogHome extends State<LogHome> {
                 int ft = (entry.height / 12).truncate();
                 int inches = (entry.height % 12).truncate();
                 String height = ft.toString() + "\'" + inches.toString() + "\"";
-                double rowWidth = MediaQuery.of(context).size.width * .8;
+                double rowWidth = MediaQuery.of(context).size.width * .9;
                 Container newRow = Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -495,11 +511,7 @@ class _LogHome extends State<LogHome> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => BodyLogEntry()),
-                    ).then((value) {
-                      setState(() {
-                        personalLog = getPersonalLog();
-                      });
-                    });
+                    );
                   },
                 ),
                 title: Text(
