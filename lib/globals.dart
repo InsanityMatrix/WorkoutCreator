@@ -133,7 +133,7 @@ Exercise DIPS = new Exercise("Dips", TRICEPS, [CHEST, DELTOIDS, RHOMBOIDS], ["di
 Exercise CONCENTRATION_CURLS = new Exercise("Concentration Curls", BICEPS, null, ["dumbbell"]);
 Exercise BENT_OVER_BARBELL_ROW = new Exercise("Bent over barbell row", DELTOIDS, [TRAPEZIUS, LATS, RHOMBOIDS, BICEPS], ["barbell"]);
 Exercise DUMBBELL_PULLOVERS = new Exercise("Dumbbell Pullovers", LATS, [CHEST, TRICEPS], ["dumbbells"]);
-
+Exercise FACE_PULLS = new Exercise("Face Pulls", DELTOIDS, [RHOMBOIDS, TRAPEZIUS], ["cable"]);
 Exercise LATERAL_RAISES = new Exercise("Lateral Raises", DELTOIDS, [TRAPEZIUS], ["dumbbell"]);
 Exercise PULLUPS = new Exercise("Pullups", LATS, [TRAPEZIUS, RHOMBOIDS, BICEPS], ["pullupbar", "calisthenics"]);
 Exercise CHINUPS = new Exercise("Chinups", BICEPS, [LATS, DELTOIDS,], ["pullupbar", "calisthenics"]);
@@ -192,7 +192,7 @@ List<Exercise> EXERCISES = [
   PLATE_PRESS, RUSSIAN_TWISTS, LEG_LIFTS, CRUNCHES,STANDING_CALF_RAISE, 
   SEATED_CALF_RAISE, INVERTED_ROWS, BW_REAR_DELT_FLY, PIKE_PRESS, INVERTED_SHRUGS,
   BULGARIAN_SPLIT_SQUATS,SINGLE_LEG_DEADLIFT, LUNGES, LATERAL_LUNGES,INCLINE_DUMBBELL_CURL,SPIDER_CURLS,
-  ROMANIAN_DEADLIFT, HANGING_LEG_LIFTS, DUMBBELL_PULLOVERS,
+  ROMANIAN_DEADLIFT, HANGING_LEG_LIFTS, DUMBBELL_PULLOVERS,FACE_PULLS
 ];
 
 Workout createWorkout(String name,int epm, List<int> selectedMuscles, Config config) {
@@ -544,23 +544,25 @@ Future<Workout> getWorkout(String filename) async {
   });
   List<Exercise> backups = [];
   List bc = decoded['Backups'];
-  bc.forEach((i){
-    List<int> secondaryMuscles = [];
-    List scm = i['SecondaryMuscles'];
-    if (scm != null) {
-      scm.forEach((j){
-        secondaryMuscles.add(j);
-      });
-    }
-    List<String> equipment = [];
-    List e = i['Equipment'];
-    if (e != null) {
-      e.forEach((j) {
-        equipment.add(j);
-      });
-    }
-    backups.add(new Exercise(i['Name'], i['PrimaryMuscles'], secondaryMuscles,equipment));
-  });
+  if(bc != null) {
+    bc.forEach((i){
+      List<int> secondaryMuscles = [];
+      List scm = i['SecondaryMuscles'];
+      if (scm != null) {
+        scm.forEach((j){
+          secondaryMuscles.add(j);
+        });
+      }
+      List<String> equipment = [];
+      List e = i['Equipment'];
+      if (e != null) {
+        e.forEach((j) {
+          equipment.add(j);
+        });
+      }
+      backups.add(new Exercise(i['Name'], i['PrimaryMuscles'], secondaryMuscles,equipment));
+    });
+  }
   workout = Workout.withBackups(decoded['Name'],exercises,backups);
   return workout;
 }

@@ -148,6 +148,7 @@ Future<List<PersonalLog>> getPersonalLog() async {
       PersonalLog log = PersonalLog.withDate(height, weight, date);
       logData.add(log);
     });
+    logData.sort((a, b) => b.date.compareTo(a.date));
     return logData;
   } else {
     return [];
@@ -205,6 +206,8 @@ Future<List<PRLog>> getPRLog() async {
       PRLog log = PRLog(exercise, weight, unit, date);
       logData.add(log);
     });
+    logData.sort((a, b) => b.date.compareTo(a.date));
+    //Sort logData most recent date first
     return logData;
   } else {
     return [];
@@ -693,7 +696,6 @@ class _BodyLogEntry extends State<BodyLogEntry> {
             //DATE
             Container(
               width: MediaQuery.of(context).size.width * .8,
-              margin: EdgeInsets.only(left: MediaQuery.of(context).size.width * .1),
               alignment: Alignment.center,
               child: FlatButton(
                 minWidth: MediaQuery.of(context).size.width * .7,
@@ -711,7 +713,6 @@ class _BodyLogEntry extends State<BodyLogEntry> {
             //Create Button
             Container(
               width: MediaQuery.of(context).size.width * .8,
-              margin: EdgeInsets.only(left: MediaQuery.of(context).size.width * .1),
               alignment: Alignment.center,
               child: FlatButton(
                 minWidth: MediaQuery.of(context).size.width * .7,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:workoutcreator/config.dart';
+import 'package:workoutcreator/templates.dart';
 import 'package:workoutcreator/research.dart';
 import 'package:workoutcreator/information.dart';
 import 'package:workoutcreator/log.dart';
@@ -13,19 +14,20 @@ const int _blackPrimaryValue = 0xFF000000;
 const MaterialColor primaryBlack = MaterialColor(
   _blackPrimaryValue,
   <int, Color>{
-    50: Color(0xFF000000),
-    100: Color(0xFF000000),
-    200: Color(0xFF000000),
-    300: Color(0xFF000000),
-    400: Color(0xFF000000),
-    500: Color(_blackPrimaryValue),
-    600: Color(0xFF000000),
-    700: Color(0xFF000000),
-    800: Color(0xFF000000),
-    900: Color(0xFF000000),
+    50: Color(0xFF231330),
+    100: Color(0xFF231330),
+    200: Color(0xFF231330),
+    300: Color(0xFF231330),
+    400: Color(0xFF231330),
+    500: Color(0xFF231330),
+    600: Color(0xFF231330),
+    700: Color(0xFF231330),
+    800: Color(0xFF231330),
+    900: Color(0xFF231330),
   },
 );
 Config mainConfig;
+Color tertiaryColor = new Color(0xFF52689c);
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -33,7 +35,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Workout Creator',
       theme: ThemeData(
-        primaryColor: new Color(0xFF231330),
+        primaryColor: new Color(0xFF1e2a45),
         primarySwatch: primaryBlack,
         accentColor: new Color(0xFF243254),
         textTheme: TextTheme(
@@ -201,7 +203,7 @@ class _WorkoutCreatorPage extends State<WorkoutCreatorPage> {
                         for (int i = 0; i < snapshot.data.length; i++) {
                           if (snapshot.data[i] != null) {
                             Widget addition = Card(
-                              color: Theme.of(context).accentColor,
+                              color: tertiaryColor,
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
@@ -264,7 +266,7 @@ class _WorkoutCreatorPage extends State<WorkoutCreatorPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  WorkoutBuilderPage(title: "Workout Builder")),
+                                  WorkoutCreation()),
                         );
                       },
                     ),
@@ -289,7 +291,133 @@ class _WorkoutCreatorPage extends State<WorkoutCreatorPage> {
         );
   }
 }
+class WorkoutCreation extends StatefulWidget {
+  WorkoutCreation({Key key}) : super(key: key);
 
+  @override
+  _WorkoutCreation createState() => _WorkoutCreation();
+}
+class _WorkoutCreation extends State<WorkoutCreation> {
+  List<Widget> getTemplateWorkouts(BuildContext context) {
+    double rowWidth = MediaQuery.of(context).size.width * 9;
+    List<Container> rows = [];
+    templateWorkouts.forEach((workout) {
+      Container newRow = Container(
+        decoration: BoxDecoration(
+          color: tertiaryColor,
+          border: Border(
+            bottom: BorderSide(color: Colors.grey[700]),
+          ),
+        ),
+        width: rowWidth,
+        height: 50,
+        child: SizedBox.expand(
+          child: FlatButton(
+            color: tertiaryColor,
+            child: Text(
+              workout.name,
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Times New Roman",
+              ),
+            ),
+            onPressed: () async {
+              globals.saveWorkout(workout.workout);
+              Navigator.of(context).popUntil((route) => route.isFirst);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        WorkoutPage(workout: workout.workout)),
+              );
+            },
+          ),
+        )
+      );
+      rows.add(newRow);
+    });
+    return rows;
+  }
+  @override
+  Widget build(BuildContext context) {
+    double m = MediaQuery.of(context).size.width / 20;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Workout Creation", style: Theme.of(context).textTheme.button),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.grey,
+            height: 4.0,
+          ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.home, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MyHomePage(title: "Home", index: 0)),
+            );
+          },
+        ),
+      ),
+      backgroundColor: Theme.of(context).primaryColor,
+      body: Container(
+        child: ListView(
+          children: <Widget>[
+            Container(
+              color: Theme.of(context).accentColor,
+              width: MediaQuery.of(context).size.width / 10 * 9,
+              margin: EdgeInsets.only(top: m*2, left: m, right: m),
+              child: ExpansionTile(
+                backgroundColor: Theme.of(context).accentColor,
+                title: Text(
+                  "Templates",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: "Times New Roman",
+                  ),
+                ),
+                children: getTemplateWorkouts(context),
+              )
+            ),
+            Container(height: 20),
+            Container(
+              color: Theme.of(context).accentColor,
+              width: MediaQuery.of(context).size.width / 10 * 9,
+              margin: EdgeInsets.only(left: m, right: m),
+              height: 50,
+              child: SizedBox.expand(
+                child: FlatButton(
+                  color: Theme.of(context).accentColor,
+                  padding: EdgeInsets.all(5),
+                  child: Text(
+                    "Create Custom Workout",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: "Times New Roman",
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              WorkoutBuilderPage(title: "Workout Builder")),
+                    );
+                  }
+                ),
+              ),
+            ),
+            
+          ],
+        ),
+      ),
+    );
+  }
+}
 class WorkoutBuilderPage extends StatefulWidget {
   WorkoutBuilderPage({Key key, this.title}) : super(key: key);
   //The title passed in from the home page
@@ -340,7 +468,7 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
 
   @override
   Widget build(BuildContext context) {
-    loadMuscleList();
+    loadMuscleList(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title, style: Theme.of(context).textTheme.button),
@@ -350,17 +478,6 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
             height: 4.0,
           ),
           preferredSize: Size.fromHeight(4.0),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.home, color: Colors.white),
-          onPressed: () {
-            Navigator.of(context).popUntil((route) => route.isFirst);
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => MyHomePage(title: "Home", index: 0)),
-            );
-          },
         ),
       ),
       backgroundColor: Theme.of(context).primaryColor,
@@ -481,7 +598,7 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
     );
   }
 
-  void loadMuscleList() {
+  void loadMuscleList(BuildContext context) {
     if (selectedMuscles.length == 0) {
       selectedMuscles.add(0);
     }
@@ -591,7 +708,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
     List<Widget> ls = [];
     for (int i = 0; i < widget.workout.exercises.length; i++) {
       Widget addition = Card(
-        color: Theme.of(context).accentColor,
+        color: tertiaryColor,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
