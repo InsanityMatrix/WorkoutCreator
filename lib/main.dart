@@ -603,58 +603,190 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
       selectedMuscles.add(0);
     }
     muscleList = [];
-    muscleList.add(new DropdownMenuItem(
-      child: new Text("Trapezius", style: Theme.of(context).textTheme.button),
-      value: globals.TRAPEZIUS,
-    ));
-    muscleList.add(new DropdownMenuItem(
-      child: new Text("Deltoids", style: Theme.of(context).textTheme.button),
-      value: globals.DELTOIDS,
-    ));
-    muscleList.add(new DropdownMenuItem(
-      child: new Text("Triceps", style: Theme.of(context).textTheme.button),
-      value: globals.TRICEPS,
-    ));
-    muscleList.add(new DropdownMenuItem(
-      child: new Text("Biceps", style: Theme.of(context).textTheme.button),
-      value: globals.BICEPS,
-    ));
-    muscleList.add(new DropdownMenuItem(
-      child: new Text("Chest", style: Theme.of(context).textTheme.button),
-      value: globals.CHEST,
-    ));
-    muscleList.add(new DropdownMenuItem(
-      child: new Text("Rhomboids", style: Theme.of(context).textTheme.button),
-      value: globals.RHOMBOIDS,
-    ));
-    muscleList.add(new DropdownMenuItem(
-      child: new Text("Lats", style: Theme.of(context).textTheme.button),
-      value: globals.LATS,
-    ));
-    muscleList.add(new DropdownMenuItem(
-      child: new Text("Glutes", style: Theme.of(context).textTheme.button),
-      value: globals.GLUTES,
-    ));
-    muscleList.add(new DropdownMenuItem(
-      child: new Text("Quads", style: Theme.of(context).textTheme.button),
-      value: globals.QUADS,
-    ));
-    muscleList.add(new DropdownMenuItem(
-      child: new Text("Hamstrings", style: Theme.of(context).textTheme.button),
-      value: globals.HAMSTRINGS,
-    ));
-    muscleList.add(new DropdownMenuItem(
-      child: new Text("Calves", style: Theme.of(context).textTheme.button),
-      value: globals.CALVES,
-    ));
-    muscleList.add(new DropdownMenuItem(
-      child: new Text("Abs", style: Theme.of(context).textTheme.button),
-      value: globals.ABS,
-    ));
-    muscleList.add(new DropdownMenuItem(
-      child: new Text("Obliques", style: Theme.of(context).textTheme.button),
-      value: globals.OBLIQUES,
-    ));
+    muscleList.add(getMenuItem(context, "Trapezius", globals.TRAPEZIUS));
+    muscleList.add(getMenuItem(context, "Deltoids", globals.DELTOIDS));
+    muscleList.add(getMenuItem(context, "Triceps", globals.TRICEPS));
+    muscleList.add(getMenuItem(context, "Biceps", globals.BICEPS));
+    muscleList.add(getMenuItem(context, "Chest", globals.CHEST));
+    muscleList.add(getMenuItem(context, "Rhomboids", globals.RHOMBOIDS));
+    muscleList.add(getMenuItem(context, "Lats", globals.LATS));
+    muscleList.add(getMenuItem(context, "Glutes", globals.GLUTES));
+    muscleList.add(getMenuItem(context, "Quads", globals.QUADS));
+    muscleList.add(getMenuItem(context, "Hamstrings", globals.HAMSTRINGS));
+    muscleList.add(getMenuItem(context, "Calves", globals.HAMSTRINGS));
+    muscleList.add(getMenuItem(context, "Abs", globals.ABS));
+    muscleList.add(getMenuItem(context, "Obliques", globals.OBLIQUES));
+  }
+  Map<String, String> licenseMap = {
+    "Rhomboids":"By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
+    "Trapezius":"By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
+    "Deltoids":"By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
+    "Triceps":"By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
+    "Biceps":"By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
+    "Lats":"By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
+    "Chest":"By Tarawneh licensed under Attribution-Share Alike 3.0 Unported",
+    "Glutes":"By Anvandare Chrizz licensed under Attribution-Share Alike 3.0 Unported",
+    "Quads":"By he.wikipedia licensed under Attribution-Share Alike 3.0 Unported",
+    "Hamstrings": "By BruceBlaus licensed under Attribution-Share Alike 4.0 International",
+    "Calves": "By welcomeimages licensed under Attribution 4.0 International",
+  };
+  DropdownMenuItem<int> getMenuItem(BuildContext context, String muscleName, int muscle) {
+    Widget child1;
+    if(muscleName == "Abs" || muscleName == "Obliques") {
+      child1 = Container();
+    } else if(muscleName == "Rhomboids") {
+      child1 = FlatButton(
+        padding: EdgeInsets.all(0),
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        child: Icon(
+          Icons.info_outline,
+          color: Colors.white,
+        ),
+        color: Colors.transparent,
+        onPressed: () async {
+          await showDialog(
+            context: context,
+            builder: (ctxt) {
+              return Dialog(
+                child: Container(
+                  width: 280,
+                  height: 300,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 280,
+                        height: 260,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: ExactAssetImage('assets/muscles/' + muscleName + '.gif'),
+                            fit: BoxFit.cover,
+                          )
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            FlatButton(
+                              child: Icon(Icons.close, color: Colors.black),
+                              color: Colors.transparent,
+                              onPressed: () {
+                                Navigator.pop(ctxt);
+                              },
+                            )
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: 280,
+                        height: 40,
+                        color: tertiaryColor,
+                        child: Row(
+                          children: [
+                            Icon(Icons.info_outline, color: Colors.white),
+                            Text(
+                              licenseMap[muscleName],
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 8,
+                              )
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                  
+
+                )
+              );
+            },
+          );
+        }
+      );
+    } else {
+      child1 = FlatButton(
+        padding: EdgeInsets.all(0),
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        child: Icon(
+          Icons.info_outline,
+          color: Colors.white,
+        ),
+        color: Colors.transparent,
+        onPressed: () async {
+          await showDialog(
+            context: context,
+            builder: (ctxt) {
+              return Dialog(
+                child: Container(
+                  width: 280,
+                  height: 300,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 280,
+                        height: 260,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: ExactAssetImage('assets/muscles/' + muscleName + '.png'),
+                            fit: BoxFit.cover,
+                          )
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            FlatButton(
+                              child: Icon(Icons.close, color: Colors.black),
+                              color: Colors.transparent,
+                              onPressed: () {
+                                Navigator.pop(ctxt);
+                              },
+                            )
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: 280,
+                        height: 40,
+                        color: tertiaryColor,
+                        child: Row(
+                          children: [
+                            Icon(Icons.info_outline, color: Colors.white),
+                            Text(
+                              licenseMap[muscleName],
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 7,
+                              )
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                  
+
+                )
+              );
+            },
+          );
+        }
+      );
+    }
+    return DropdownMenuItem(
+      child: new Container(
+        padding: EdgeInsets.only(left: 15, right: 15),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width / 6,
+              child: child1,
+            ),
+            Text(muscleName, style: Theme.of(context).textTheme.button),
+          ],
+        ),
+      ),
+      value: muscle,
+    );
   }
 }
 

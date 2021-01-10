@@ -152,6 +152,7 @@ Exercise BENT_OVER_DUMBELL_ROW = new Exercise("Bent Over Dumbell Row", RHOMBOIDS
 Exercise SQUEEZE_PRESS = new Exercise("Squeeze Press", CHEST, [TRICEPS], ["dumbbell"]);
 Exercise PLATE_PRESS = new Exercise("Plate Press", CHEST, [TRICEPS], ["barbell"]);
 Exercise PUSHUPS = new Exercise("Pushups", CHEST, [TRICEPS], ["calisthenics"]);
+Exercise FRONT_RAISE = new Exercise("Front Raise", DELTOIDS, null, ["dumbbell"]);
 //Lower Body
 Exercise DEADLIFT = new Exercise("Deadlift", GLUTES, [QUADS, LATS, TRAPEZIUS], ["barbell", "dumbbell"]);
 Exercise ROMANIAN_DEADLIFT = new Exercise("Romanian Deadlifts", HAMSTRINGS, [GLUTES, QUADS], ["barbell","dumbbell"]);
@@ -192,7 +193,8 @@ List<Exercise> EXERCISES = [
   PLATE_PRESS, RUSSIAN_TWISTS, LEG_LIFTS, CRUNCHES,STANDING_CALF_RAISE, 
   SEATED_CALF_RAISE, INVERTED_ROWS, BW_REAR_DELT_FLY, PIKE_PRESS, INVERTED_SHRUGS,
   BULGARIAN_SPLIT_SQUATS,SINGLE_LEG_DEADLIFT, LUNGES, LATERAL_LUNGES,INCLINE_DUMBBELL_CURL,SPIDER_CURLS,
-  ROMANIAN_DEADLIFT, HANGING_LEG_LIFTS, DUMBBELL_PULLOVERS,FACE_PULLS
+  ROMANIAN_DEADLIFT, HANGING_LEG_LIFTS, DUMBBELL_PULLOVERS,FACE_PULLS, FRONT_RAISE,
+  
 ];
 
 Workout createWorkout(String name,int epm, List<int> selectedMuscles, Config config) {
@@ -572,7 +574,7 @@ String getMuscleName(int muscle) {
       return "Trapezius";
       break;
     case DELTOIDS:
-      return "Deltoids";
+      return "Shoulders";
       break;
     case TRICEPS:
       return "Triceps";
