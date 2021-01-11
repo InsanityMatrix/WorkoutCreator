@@ -363,7 +363,6 @@ class _WorkoutCreation extends State<WorkoutCreation> {
           },
         ),
       ),
-      backgroundColor: Theme.of(context).primaryColor,
       body: Container(
         child: ListView(
           children: <Widget>[

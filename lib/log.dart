@@ -67,7 +67,7 @@ class PRLog {
 //LOGIC
 
 //Personal Log
-void addToPersonalLog(PersonalLog entry) async {
+Future<void> addToPersonalLog(PersonalLog entry) async {
   final directory = await getApplicationDocumentsDirectory();
   final path = directory.path;
   File logFile = File("$path/logs/personalLog.json");
@@ -154,8 +154,135 @@ Future<List<PersonalLog>> getPersonalLog() async {
     return [];
   }
 }
+
+
+//WORKOUT LOG
+class WorkoutLog {
+  Workout workout;
+  List<double> sets;
+  List<double> reps;
+  List<double> weight;
+  DateTime date;
+  WorkoutLog(this.workout, this.sets, this.reps, this.weight, this.date);
+
+  Map<String, dynamic> toJson() => {
+    'Workout': workout,
+    'Sets': sets,
+    'Reps': reps,
+    'Weight': weight,
+    'Date': date.toString(),
+  };
+
+  @override
+  String toString() {
+    return "Workout: $workout, Sets: $sets, Reps: $reps, Weight: $weight, Date: $date,";
+  }
+}
+
+Future<List<WorkoutLog>> getWorkoutLog() async {
+  final directory = await getApplicationDocumentsDirectory();
+  final path = directory.path;
+  File logFile = File('$path/logs/workoutLog.json');
+  if(await logFile.exists()) {
+    List<WorkoutLog> logData = [];
+    String json = await logFile.readAsString();
+    var decoded = jsonDecode(json);
+    decoded.forEach((l) {
+      dynamic w = l['Workout'];
+      dynamic s = l['Sets'];
+      dynamic r = l['Reps'];
+      dynamic we = l['Weight'];
+      //Parse Workout
+      Workout workout;
+      List<Exercise> exercises = [];
+      List ex = w['Exercises'];
+      ex.forEach((i) {
+        List<int> secondaryMuscles = [];
+        List scm = i['SecondaryMuscles'];
+        if (scm != null) {
+          scm.forEach((j){
+            secondaryMuscles.add(j);
+          });
+        }
+        List<String> equipment = [];
+        List e = i['Equipment'];
+        if(e != null) {
+          e.forEach((j) {
+            equipment.add(j);
+          });
+        }
+        exercises.add(new Exercise(i['Name'], i['PrimaryMuscles'], secondaryMuscles, equipment));
+      });
+      workout = new Workout(w['Name'], exercises);
+      //Parse Sets
+      List<double> sets = [];
+      s.forEach((k) {
+        sets.add(k);
+      });
+      //Parse Reps
+      List<double> reps = [];
+      r.forEach((k) {
+        reps.add(k);
+      });
+
+      //Parse Weight
+      List<double> weights = [];
+      we.forEach((k) {
+        weights.add(k);
+      });
+
+      DateTime date = DateTime.parse(l['Date']);
+      WorkoutLog log = WorkoutLog(workout, sets, reps, weights, date);
+      logData.add(log);
+    });
+    logData.sort((a, b) => b.date.compareTo(a.date));
+    return logData;
+  } else {
+    return [];
+  }
+}
+Future<void> addToWorkoutLog(WorkoutLog entry) async {
+  final directory = await getApplicationDocumentsDirectory();
+  final path = directory.path;
+  File logFile= File("$path/logs/workoutLog.json");
+  List<WorkoutLog> logData = [];
+  if(await logFile.exists()) {
+    logData = await getWorkoutLog();
+  } else {
+    await logFile.create();
+  }
+  logData.add(entry);
+  logFile.deleteSync();
+  print(logData);
+  String encoded = jsonEncode(logData);
+  logFile.writeAsString(encoded);
+}
+Future<void> removeFromWorkoutLog(WorkoutLog entry) async {
+  final directory = await getApplicationDocumentsDirectory();
+  final path = directory.path;
+  File logFile = File("$path/logs/workoutLog.json");
+  List<WorkoutLog> logData = await getWorkoutLog();
+  int toRemove = -1;
+  logData.forEach((val) {
+    if(val.toJson() == entry.toJson()) {
+      toRemove = logData.indexOf(val);
+    }
+  });
+  if(toRemove != -1) {
+    logData.removeAt(toRemove);
+  }
+  if(logData == []) {
+    logFile.deleteSync();
+  } else {
+    logFile.deleteSync();
+    logFile.createSync();
+
+    String encoded = jsonEncode(logData);
+    logFile.writeAsString(encoded);
+  }
+}
 // PR LOG
-void addToPRLog(PRLog entry) async {
+Future<void> addToPRLog(PRLog entry) async {
   final directory = await getApplicationDocumentsDirectory();
   final path = directory.path;
   File logFile = File("$path/logs/prLog.json");
@@ -167,7 +294,6 @@ void addToPRLog(PRLog entry) async {
     await logFile.create();
   }
   logData.add(entry);
-  //TODO: Sort logs by most recent date first before saving
   logFile.deleteSync();
   logFile.createSync();
   
@@ -249,6 +375,7 @@ class LogHome extends StatefulWidget {
 class _LogHome extends State<LogHome> {
   Future<List<PersonalLog>> personalLog;
   Future<List<PRLog>> prLog;
+  Future<List<WorkoutLog>> workoutLog;
   void rebuildAllChildren(BuildContext context) {
     void rebuild(Element el) {
       el.markNeedsBuild();
@@ -261,10 +388,12 @@ class _LogHome extends State<LogHome> {
     super.initState();
     personalLog = getPersonalLog();
     prLog = getPRLog();
+    workoutLog = getWorkoutLog();
     if(widget.setState != null) {
       setState((){
         prLog = getPRLog();
         personalLog = getPersonalLog();
+        workoutLog = getWorkoutLog();
       });
     }
   }
@@ -276,6 +405,7 @@ class _LogHome extends State<LogHome> {
         children: <Widget>[
           loadPersonalLog(context),
           loadPRLog(context),
+          loadWorkoutLog(context),
         ],
       ),
     );
@@ -535,6 +665,118 @@ class _LogHome extends State<LogHome> {
     );
   }
 
+  Container loadWorkoutLog(BuildContext context) {
+    double m = MediaQuery.of(context).size.width / 20;
+    return Container(
+      color: Theme.of(context).accentColor,
+      width: MediaQuery.of(context).size.width / 10 * 9,
+      margin: EdgeInsets.only(top: m, left: m, right: m),
+      child: FutureBuilder<List<WorkoutLog>>(
+        future: workoutLog,
+        builder: (BuildContext ctxt, AsyncSnapshot<List<WorkoutLog>> snapshot) {
+          if(snapshot.hasData) {
+            if(snapshot.data == null) {
+              return Text("Something Went Wrong", style: TextStyle(color: Colors.white));
+            } else {
+              List<WorkoutLog> log = snapshot.data;
+              List<Container> rows = [];
+              log.forEach((entry) {
+                String workoutName = entry.workout.name;
+                double rowWidth = MediaQuery.of(context).size.width * .9;
+                Container newRow = Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border(
+                      bottom: BorderSide(color: Colors.grey[700]),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: rowWidth * .5,
+                        alignment: Alignment.center,
+                        child: Text(
+                          workoutName,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: "Times New Roman",
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: rowWidth * .3,
+                        alignment: Alignment.center,
+                        child: Text(
+                          entry.date.month.toString() + "/" + entry.date.day.toString(),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: "Times New Roman",
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: rowWidth * .2,
+                        alignment: Alignment.center,
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.remove_circle,
+                            color: Colors.black,
+                          ),
+                          color: Colors.white,
+                          onPressed: () async {
+                            await removeFromWorkoutLog(entry);
+                            setState((){
+                              workoutLog = getWorkoutLog();
+                            });
+                          }
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+                rows.add(newRow);
+              });
+              return ExpansionTile(
+                backgroundColor: Theme.of(context).accentColor,
+                leading: FlatButton.icon(
+                  icon: Icon(
+                    Icons.add,
+                    color: Colors.white,
+                  ),
+                  label: Text(
+                    "",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: "Times New Roman",
+                    ),
+                  ),
+                  color: Theme.of(context).accentColor,
+                  onPressed: (){
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => WorkoutLoggerSetup()),
+                    );
+                  },
+                ),
+                title: Text(
+                  "Workout Log",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: "Times New Roman",
+                  ),
+                ),
+                children: rows,
+              );
+            }
+          } else {
+            return Text("Loading");
+          }
+        },
+      ),
+    );
+  }
 }
 
 class BodyLogEntry extends StatefulWidget {
@@ -738,13 +980,14 @@ class _BodyLogEntry extends State<BodyLogEntry> {
                     DateTime time = selectedDate;
 
                     PersonalLog entry = PersonalLog.withDate(height, weight, time);
-                    addToPersonalLog(entry);
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => MyHomePage(title: "Home", index: 2)),
-                    );
+                    addToPersonalLog(entry).then((_){
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MyHomePage(title: "Home", index: 2)),
+                      );
+                    });
                   }
                   return;
                 }
@@ -987,13 +1230,15 @@ class _PRLogEntry extends State<PRLogEntry> {
                     DateTime time = selectedDate;
 
                     PRLog entry = PRLog(exercise, weight, unit,time);
-                    addToPRLog(entry);
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => MyHomePage(title: "Home", index: 2)),
-                    );
+                    addToPRLog(entry).then((_){
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MyHomePage(title: "Home", index: 2)),
+                      );
+                    });
+                    
                   }
                   return;
                 }
@@ -1003,5 +1248,548 @@ class _PRLogEntry extends State<PRLogEntry> {
         ),
       ),
     );
+  }
+}
+
+class WorkoutLoggerSetup extends StatefulWidget {
+  WorkoutLoggerSetup({Key key}) : super(key: key);
+
+  @override
+  _WorkoutLoggerSetup createState() => _WorkoutLoggerSetup();
+}
+class _WorkoutLoggerSetup extends State<WorkoutLoggerSetup> {
+
+  @override
+  Widget build(BuildContext context) {
+    double m = MediaQuery.of(context).size.width / 20;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Workout Logging", style: Theme.of(context).textTheme.button),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.grey,
+            height: 4.0,
+          ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.home, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MyHomePage(title: "Home", index: 2)),
+            );
+          },
+        ),
+      ),
+      backgroundColor: Theme.of(context).primaryColor,
+      body: Container(
+        child: ListView(
+          children: <Widget>[
+            FutureBuilder<List<String>>(
+              future: getWorkouts(),
+              builder:(BuildContext ctxt, AsyncSnapshot<List<String>> snapshot) {
+                if(snapshot.hasData) {
+                  if(snapshot.data == null) {
+                    return Container();
+                  } else {
+                    return Container(
+                      color: Theme.of(context).accentColor,
+                      width: MediaQuery.of(context).size.width / 10 * 9,
+                      margin: EdgeInsets.only(top: m*2, left: m, right: m),
+                      child: ExpansionTile(
+                        backgroundColor: Theme.of(context).accentColor,
+                        title: Text(
+                          "Your Workouts",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: "Times New Roman",
+                          ),
+                        ),
+                        children: getYourWorkouts(context, snapshot.data),
+                      )
+                    );
+                  }
+                } else {
+                  return Text("Something Went Wrong");
+                }
+              }
+            ),
+            Container(height: 20),
+            Container(
+              width: MediaQuery.of(context).size.width * .9,
+              height: 50,
+              margin: EdgeInsets.only(left: m, right: m),
+              child: SizedBox.expand(
+                child: FlatButton(
+                  child: Text(
+                    "Log Custom Workout",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: "Times New Roman",
+                    ),
+                  ),
+                  color: tertiaryColor,
+                  onPressed: () {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => WorkoutLogger(workout: null)),
+                    );
+                  }
+                ),
+              ),
+            ),
+          ]
+        )
+      ),
+    );
+  }
+
+  List<Widget> getYourWorkouts(BuildContext context, List<String> workouts) {
+    double rowWidth = MediaQuery.of(context).size.width * .9;
+    List<Container> rows = [];
+    workouts.forEach((workout) {
+      Container newRow = Container(
+        decoration: BoxDecoration(
+          color: tertiaryColor,
+          border: Border(
+            bottom: BorderSide(color: Colors.grey[700]),
+          ),
+        ),
+        width: rowWidth,
+        height: 50,
+        child: Row(
+          children:[
+            Container(
+              width: rowWidth * .75,
+              alignment: Alignment.center,
+              child: Text(
+                workout,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: "Times New Roman",
+                ),
+              ),
+            ),
+            Container(
+              width: rowWidth * .25,
+              child: SizedBox.expand(
+                child: FlatButton(
+                  child: Icon(Icons.add, color: Colors.white),
+                  color: tertiaryColor,
+                  onPressed: () async{
+                    Workout w = await getWorkout(workout + ".json");
+                    w.name = workout;
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => WorkoutLogger(workout: w)),
+                    );
+                  }
+                )
+              )
+            )
+          ]
+        ),
+      );
+      rows.add(newRow);
+    });
+
+    return rows;
+  }
+}
+
+class WorkoutLogger extends StatefulWidget {
+  final Workout workout;
+  WorkoutLogger({Key key, this.workout}) : super(key: key);
+
+  @override
+  _WorkoutLogger createState() => _WorkoutLogger();
+}
+
+class _WorkoutLogger extends State<WorkoutLogger> {
+    //KEYS AND CONTROLLERS
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  TextEditingController nameController = new TextEditingController();
+  List<TextEditingController> weightControllers = [];
+  List<TextEditingController> setControllers = [];
+  List<TextEditingController> repControllers = [];
+  List<Exercise> exercises = [];
+  List<DropdownMenuItem<Exercise>> exerciseList = [];
+  int exerciseButtons = 1;
+  DateTime selectedDate = DateTime.now();
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2015, 8),
+      lastDate: DateTime(2101)
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
+  @override
+  void initState() {
+    super.initState();
+    if(widget.workout != null) {
+      widget.workout.exercises.forEach((exercise) {
+        EXERCISES.forEach((value) {
+          if(exercise.toString() == value.toString()) {
+            exercises.add(value);
+          }
+        });
+        setControllers.add(TextEditingController());
+        repControllers.add(TextEditingController());
+        weightControllers.add(TextEditingController());
+      });
+      exerciseButtons = widget.workout.exercises.length;
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
+    loadExerciseList();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Workout Logging", style: Theme.of(context).textTheme.button),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.grey,
+            height: 4.0,
+          ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.home, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MyHomePage(title: "Home", index: 2)),
+            );
+          },
+        ),
+      ),
+      backgroundColor: Theme.of(context).primaryColor,
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          children: buildLogger(context),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> buildLogger(BuildContext context) {
+    double m = MediaQuery.of(context).size.width / 20;
+    double rowWidth = MediaQuery.of(context).size.width * .9;
+    List<Widget> widgets = [];
+    
+    String name = "";
+    if(widget.workout != null) {
+      name = widget.workout.name;
+      nameController.text = name;
+    } else if(exercises.length == 0) {
+      exercises.add(EXERCISES[0]);
+    }
+    Widget nameWidget = Container(
+      width: rowWidth,
+      margin: EdgeInsets.only(top: m * 2, left: m, right: m), 
+      child: TextFormField(
+        autocorrect: true,
+        style: Theme.of(context).textTheme.button,
+        cursorColor: Colors.white,
+        validator: (value) {
+          if(value.isEmpty) {
+            return 'You need to enter a workout name';
+          }
+          return null;
+        },
+        decoration: const InputDecoration(
+          labelText: 'Workout Name',
+          labelStyle: TextStyle(color: Color(0xFFdbdbdb)),
+          contentPadding: EdgeInsets.all(20.0),
+        ),
+        controller: nameController,
+      ),
+    );
+    //DateTime Picker
+    Widget dateWidget = Container(
+      width: rowWidth,
+      margin: EdgeInsets.only(left: m, right: m, top: m * 2),
+      alignment: Alignment.center,
+      child: FlatButton(
+        minWidth: rowWidth,
+        color: Theme.of(context).accentColor,
+        child: Text(
+          "${selectedDate.toLocal()}".split(' ')[0],
+          style: TextStyle(
+            color: Colors.white,
+            fontFamily: "Times New Roman",
+          ),
+        ),
+        onPressed: () => _selectDate(context),
+      ),
+    );
+    widgets.add(nameWidget);
+    widgets.add(dateWidget);
+    //For Each Exercise added
+    for(int i = 0; i < exerciseButtons; i++) {
+      if(setControllers.length == i) {
+        setControllers.add(TextEditingController());
+        repControllers.add(TextEditingController());
+        weightControllers.add(TextEditingController());
+      }
+      Container nRow = new Container(
+        width: rowWidth,
+        margin: EdgeInsets.only(top: m * 2, left: m, right: m),
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          border: Border(
+            bottom: BorderSide(color: Colors.grey[700]),
+          ),
+        ),
+        child: Column(
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children:[
+                getExerciseButton(i),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: rowWidth / 3,
+                  child: TextFormField(
+                    controller: setControllers[i],
+                    style: Theme.of(context).textTheme.button,
+                    cursorColor: Colors.white,
+                    decoration: const InputDecoration(
+                      labelText: 'Sets',
+                      labelStyle: TextStyle(color: Color(0xFFdbdbdb)),
+                    ),
+                    validator: (value) {
+                      if(!isNumeric(value)) {
+                        return 'This value needs to be a number!';
+                      } else if(value.isEmpty) {
+                        return 'You need to enter sets!';
+                      }
+                      return null;
+                    }
+                  ),
+                ),
+                Container(
+                  width: rowWidth / 3,
+                  child: TextFormField(
+                    controller: repControllers[i],
+                    style: Theme.of(context).textTheme.button,
+                    cursorColor: Colors.white,
+                    decoration: const InputDecoration(
+                      labelText: 'Reps',
+                      labelStyle: TextStyle(color: Color(0xFFdbdbdb)),
+                    ),
+                    validator: (value) {
+                      if(!isNumeric(value)) {
+                        return 'This value needs to be a number!';
+                      } else if(value.isEmpty) {
+                        return 'You need to enter reps!';
+                      }
+                      return null;
+                    }
+                  ),
+                ),
+                Container(
+                  width: rowWidth / 3,
+                  child: TextFormField(
+                    controller: weightControllers[i],
+                    style: Theme.of(context).textTheme.button,
+                    cursorColor: Colors.white,
+                    decoration: const InputDecoration(
+                      labelText: 'Weight',
+                      labelStyle: TextStyle(color: Color(0xFFdbdbdb)),
+                    ),
+                    validator: (value) {
+                      if(!isNumeric(value)) {
+                        return 'This value needs to be a number!';
+                      } else if(value.isEmpty) {
+                        return 'You need to enter weight!';
+                      }
+                      return null;
+                    }
+                  ),
+                ),
+              ]
+            )
+          ],
+        ),
+      );
+      widgets.add(nRow);
+    }
+    //Add Exercise Button
+    Container buttons = new Container(
+      width: rowWidth,
+      margin: EdgeInsets.only(top: m * 2, left: m, right: m),
+      height: 50,
+      child: Row(
+        children: [
+          Container(
+            width: rowWidth / 2,
+            child: SizedBox.expand(
+              child: FlatButton(
+                color: tertiaryColor,
+                child: Text(
+                  "Add Exercise",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: "Times New Roman",
+                  ),
+                ),
+                onPressed: () {
+                  setState((){
+                    exerciseButtons += 1;
+                    exercises.add(EXERCISES[0]);
+                    setControllers.add(TextEditingController());
+                    repControllers.add(TextEditingController());
+                    weightControllers.add(TextEditingController());
+                  });
+                }
+              ),
+            ),
+          ),
+          Container(
+            width: rowWidth / 2,
+            child: SizedBox.expand(
+              child: FlatButton(
+                color: tertiaryColor,
+                child: Text(
+                  "Remove Exercise",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: "Times New Roman",
+                  ),
+                ),
+                onPressed: () {
+                  setState((){
+                    exerciseButtons -= 1;
+                    exercises.removeLast();
+                    setControllers.removeLast();
+                    repControllers.removeLast();
+                    weightControllers.removeLast();
+                  });
+                }
+              ),
+            ),
+          ),
+        ]
+      )
+    );
+    widgets.add(buttons);
+
+    //LOG BUTTON
+    Container logButton = Container(
+      width: rowWidth,
+      height: 50,
+      margin: EdgeInsets.only(top: 0, left: m, right: m),
+      child: SizedBox.expand(
+        child: FlatButton(
+          child: Text(
+            "Log Workout",
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: "Times New Roman",
+            ),
+          ),
+          color: tertiaryColor,
+          onPressed: () {
+            if(_formKey.currentState.validate()) {
+              //Create Workout
+              Workout workout;
+              String name = nameController.text;
+              workout = Workout(name, exercises);
+              //Get Sets, reps, and date
+              List<double> sets = [];
+              List<double> reps = [];
+              List<double> weights = [];
+              setControllers.forEach((controller){
+                sets.add(double.parse(controller.text));
+              });
+              repControllers.forEach((controller){
+                reps.add(double.parse(controller.text));
+              });
+              weightControllers.forEach((controller){
+                weights.add(double.parse(controller.text));
+              });
+
+              WorkoutLog newLog = WorkoutLog(workout, sets, reps, weights, selectedDate);
+              addToWorkoutLog(newLog).then((_){
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MyHomePage(title: "Home", index: 2)),
+                );
+              });
+            }
+          }
+        ),
+      ),
+    );
+    widgets.add(logButton);
+    return widgets;
+  }
+
+  Widget getExerciseButton(int index) {
+    if(exercises.length == index) {
+      exercises.add(EXERCISES[0]);
+    }
+    return DropdownButton(
+      dropdownColor: Theme.of(context).accentColor,
+      focusColor: Color(0xFF525252),
+      items: exerciseList,
+      hint: new Text('Select Exercise',
+        style: Theme.of(context).textTheme.button
+      ),
+      value: exercises[index],
+      onChanged: (value) {
+        setState((){
+          exercises[index] = value;
+        });
+      }
+    );
+  }
+
+  void loadExerciseList() {
+    if(exercises.length == 0) {
+      exercises.add(EXERCISES[0]);
+      setControllers.add(TextEditingController());
+      repControllers.add(TextEditingController());
+      weightControllers.add(TextEditingController());
+    }
+    if(exerciseList.length > 2) {
+      return;
+    }
+    EXERCISES.forEach((exercise) {
+      exerciseList.add(DropdownMenuItem(
+        child: new Text(
+          exercise.name,
+          style: TextStyle(
+            color: Colors.white,
+            fontFamily: "Times New Roman",
+          ),
+        ),
+        value: exercise,
+      ));
+    });
   }
 }

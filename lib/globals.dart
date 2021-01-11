@@ -45,11 +45,24 @@ class Workout {
     
   }
 
-  Map<String, dynamic> toJson() => {
-    'Name':name,
-    'Exercises':exercises,
-    'Backups': backups,
-  };
+  Map<String, dynamic> toJson()  {
+    if(backups == null) {
+      return {
+        'Name': name,
+        'Exercises': exercises,
+      };
+    }
+    return {
+      'Name':name,
+      'Exercises':exercises,
+      'Backups': backups,
+    };
+  }
+
+  @override
+  String toString() {
+    return "Name: $name, Exercises: $exercises, Backups: $backups";
+  }
 }
 
 class Exercise {
@@ -57,7 +70,10 @@ class Exercise {
   int primaryMuscle;
   List<int> secondaryMuscles;
   List<String> equipment;
-  
+
+  @override
+  bool operator ==(Object other) => other is Exercise && other.name == name;
+
   Exercise(this.name, this.primaryMuscle, this.secondaryMuscles, this.equipment);
   Map<String, dynamic> toJson() => {
     'Name':name,
