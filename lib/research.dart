@@ -120,7 +120,7 @@ class _SupplementsPage extends State<SupplementsPage> {
           preferredSize: Size.fromHeight(4.0),
         ),
         leading: IconButton(
-          icon: Icon(Icons.home, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).popUntil((route) => route.isFirst);
             Navigator.pushReplacement(
@@ -310,7 +310,7 @@ class _BeginnerQuestions extends State<BeginnerQuestions> {
           preferredSize: Size.fromHeight(4.0),
         ),
         leading: IconButton(
-          icon: Icon(Icons.home, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).popUntil((route) => route.isFirst);
             Navigator.pushReplacement(
@@ -426,7 +426,7 @@ class _PreworkoutsPage extends State<PreworkoutsPage> {
           preferredSize: Size.fromHeight(4.0),
         ),
         leading: IconButton(
-          icon: Icon(Icons.home, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).popUntil((route) => route.isFirst);
             Navigator.pushReplacement(
@@ -546,7 +546,7 @@ class _ProgramsPage extends State<ProgramsPage> {
           preferredSize: Size.fromHeight(4.0),
         ),
         leading: IconButton(
-          icon: Icon(Icons.home, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).popUntil((route) => route.isFirst);
             Navigator.pushReplacement(

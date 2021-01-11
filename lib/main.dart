@@ -338,6 +338,46 @@ class _WorkoutCreation extends State<WorkoutCreation> {
     });
     return rows;
   }
+  List<Widget> getCelebrityWorkouts(BuildContext context) {
+    double rowWidth = MediaQuery.of(context).size.width * 9;
+    List<Container> rows = [];
+    celebrityWorkouts.forEach((workout) {
+      Container newRow = Container(
+        decoration: BoxDecoration(
+          color: tertiaryColor,
+          border: Border(
+            bottom: BorderSide(color: Colors.grey[700]),
+          ),
+        ),
+        width: rowWidth,
+        height: 50,
+        child: SizedBox.expand(
+          child: FlatButton(
+            color: tertiaryColor,
+            child: Text(
+              workout.name,
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Times New Roman",
+              ),
+            ),
+            onPressed: () async {
+              globals.saveWorkout(workout.workout);
+              Navigator.of(context).popUntil((route) => route.isFirst);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        WorkoutPage(workout: workout.workout)),
+              );
+            },
+          ),
+        )
+      );
+      rows.add(newRow);
+    });
+    return rows;
+  }
   @override
   Widget build(BuildContext context) {
     double m = MediaQuery.of(context).size.width / 20;
@@ -352,7 +392,7 @@ class _WorkoutCreation extends State<WorkoutCreation> {
           preferredSize: Size.fromHeight(4.0),
         ),
         leading: IconButton(
-          icon: Icon(Icons.home, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).popUntil((route) => route.isFirst);
             Navigator.pushReplacement(
@@ -363,6 +403,7 @@ class _WorkoutCreation extends State<WorkoutCreation> {
           },
         ),
       ),
+      backgroundColor: Theme.of(context).primaryColor,
       body: Container(
         child: ListView(
           children: <Widget>[
@@ -380,6 +421,22 @@ class _WorkoutCreation extends State<WorkoutCreation> {
                   ),
                 ),
                 children: getTemplateWorkouts(context),
+              )
+            ),
+            Container(
+              color: Theme.of(context).accentColor,
+              width: MediaQuery.of(context).size.width / 10 * 9,
+              margin: EdgeInsets.only(top: m*2, left: m, right: m),
+              child: ExpansionTile(
+                backgroundColor: Theme.of(context).accentColor,
+                title: Text(
+                  "Celebrity Workouts",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: "Times New Roman",
+                  ),
+                ),
+                children: getCelebrityWorkouts(context),
               )
             ),
             Container(height: 20),
@@ -812,7 +869,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
           preferredSize: Size.fromHeight(4.0),
         ),
         leading: IconButton(
-          icon: Icon(Icons.home, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).popUntil((route) => route.isFirst);
             Navigator.pushReplacement(
@@ -937,7 +994,7 @@ class _SetupPageState extends State<SetupPage> {
     {
       'value': 'homeGym',
       'label': 'Home Gym',
-      'icon': Icon(Icons.home),
+      'icon': Icon(Icons.arrow_back),
       'textStyle': TextStyle(color: Colors.black),
     },
     {

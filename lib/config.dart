@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:workoutcreator/main.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:launch_review/launch_review.dart';
 import 'dart:convert';
 
 class Config {
@@ -90,7 +91,7 @@ class _SettingsPage extends State<SettingsPage> {
           preferredSize: Size.fromHeight(4.0),
         ),
         leading: IconButton(
-          icon: Icon(Icons.home, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).popUntil((route) => route.isFirst);
             Navigator.pushReplacement(
@@ -135,6 +136,30 @@ class _SettingsPage extends State<SettingsPage> {
               ),
             ),
           ),
+          Container(
+            width: MediaQuery.of(context).size.width * .9,
+            margin: EdgeInsets.all(MediaQuery.of(context).size.width * .05),
+            color: tertiaryColor,
+            height: 50,
+            child: SizedBox.expand(
+              child: FlatButton(
+                color: tertiaryColor,
+                child: Text(
+                  "Leave a Review!",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: "Times New Roman",
+                  ),
+                ),
+                onPressed: () {
+                  LaunchReview.launch(
+                    androidAppId: "com.dvpie.workoutcreator",
+                    iOSAppId: "com.dvpie.workoutcreator",
+                  );
+                }
+              )
+            )
+          )
         ],
       ),
     );

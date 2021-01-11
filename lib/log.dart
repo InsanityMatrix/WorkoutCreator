@@ -1,9 +1,12 @@
 library workoutcreator.log;
 
+import 'dart:collection';
+
 import 'package:workoutcreator/main.dart';
 import 'package:workoutcreator/globals.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'dart:io';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
@@ -264,7 +267,7 @@ Future<void> removeFromWorkoutLog(WorkoutLog entry) async {
   List<WorkoutLog> logData = await getWorkoutLog();
   int toRemove = -1;
   logData.forEach((val) {
-    if(val.toJson() == entry.toJson()) {
+    if(val.toString() == entry.toString()) {
       toRemove = logData.indexOf(val);
     }
   });
@@ -693,29 +696,60 @@ class _LogHome extends State<LogHome> {
                   child: Row(
                     children: [
                       Container(
-                        width: rowWidth * .5,
-                        alignment: Alignment.center,
-                        child: Text(
-                          workoutName,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: "Times New Roman",
-                          ),
-                        ),
+                        width: rowWidth * .8,
+                        height: 30,
+                        child: SizedBox.expand(
+                          child: FlatButton(
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: .5,
+                                  height: 30,
+                                  child: SizedBox.expand(
+                                    child: Icon(Icons.arrow_right, color: Colors.black, size: 15),
+                                  )
+                                ),
+
+                                Container(
+                                  width: rowWidth * .35,
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    workoutName,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: "Times New Roman",
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: rowWidth * .3,
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    entry.date.month.toString() + "/" + entry.date.day.toString(),
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: "Times New Roman",
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            color: Colors.white,
+                            onPressed: () {
+                              Navigator.of(context).popUntil((route) => route.isFirst);
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => WorkoutEntry(entry: entry)),
+                              );
+                            }
+                          )
+                        )
                       ),
-                      Container(
-                        width: rowWidth * .3,
-                        alignment: Alignment.center,
-                        child: Text(
-                          entry.date.month.toString() + "/" + entry.date.day.toString(),
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: "Times New Roman",
-                          ),
-                        ),
-                      ),
+                      
                       Container(
                         width: rowWidth * .2,
+                        height: 30,
                         alignment: Alignment.center,
                         child: IconButton(
                           icon: Icon(
@@ -821,7 +855,7 @@ class _BodyLogEntry extends State<BodyLogEntry> {
           preferredSize: Size.fromHeight(4.0),
         ),
         leading: IconButton(
-          icon: Icon(Icons.home, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).popUntil((route) => route.isFirst);
             Navigator.pushReplacement(
@@ -1106,7 +1140,7 @@ class _PRLogEntry extends State<PRLogEntry> {
           preferredSize: Size.fromHeight(4.0),
         ),
         leading: IconButton(
-          icon: Icon(Icons.home, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).popUntil((route) => route.isFirst);
             Navigator.pushReplacement(
@@ -1273,7 +1307,7 @@ class _WorkoutLoggerSetup extends State<WorkoutLoggerSetup> {
           preferredSize: Size.fromHeight(4.0),
         ),
         leading: IconButton(
-          icon: Icon(Icons.home, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).popUntil((route) => route.isFirst);
             Navigator.pushReplacement(
@@ -1468,7 +1502,7 @@ class _WorkoutLogger extends State<WorkoutLogger> {
           preferredSize: Size.fromHeight(4.0),
         ),
         leading: IconButton(
-          icon: Icon(Icons.home, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).popUntil((route) => route.isFirst);
             Navigator.pushReplacement(
@@ -1791,5 +1825,209 @@ class _WorkoutLogger extends State<WorkoutLogger> {
         value: exercise,
       ));
     });
+  }
+}
+//TODO: Make Workout Log Entry Viewing Page
+class WorkoutEntry extends StatefulWidget {
+  final WorkoutLog entry;
+  WorkoutEntry({Key key, @required this.entry}) : super(key: key);
+
+  @override
+  _WorkoutEntry createState() => _WorkoutEntry();
+}
+class _WorkoutEntry extends State<WorkoutEntry> {
+  @override
+  Widget build(BuildContext context) {
+    double rowWidth = MediaQuery.of(context).size.width * .9;
+    double m = MediaQuery.of(context).size.width / 20;
+    DateTime date = widget.entry.date;
+    String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Workout Entry", style: Theme.of(context).textTheme.button),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.grey,
+            height: 4.0,
+          ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MyHomePage(title: "Home", index: 2)),
+            );
+          },
+        ),
+      ),
+      backgroundColor: Theme.of(context).primaryColor,
+      body: ListView(
+        children: [
+          Container(
+            width: rowWidth,
+            margin: EdgeInsets.only(top: m * 2, left: m, right: m),
+            height: 35,
+            color: tertiaryColor,
+            alignment: Alignment.center,
+            child: Text(
+              widget.entry.workout.name,
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Times New Roman",
+                fontSize: 25,
+              ),
+            ),
+          ),
+          Container(
+            width: rowWidth,
+            margin: EdgeInsets.only(top: 0, left: m, right: m),
+            height: 20,
+            color: tertiaryColor,
+            alignment: Alignment.center,
+            child: Text(
+              formattedDate,
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Times New Roman",
+              ),
+            ),
+          ),
+          Container(
+            height: MediaQuery.of(context).size.height - (m * 2) - 55,
+            child: ListView.builder(
+              itemCount: widget.entry.workout.exercises.length,
+              itemBuilder: (BuildContext ctxt, int index) {
+                double topm = index == 0 ? m : 0;
+                Exercise exercise = widget.entry.workout.exercises[index];
+                double sets = widget.entry.sets[index];
+                double reps = widget.entry.reps[index];
+                double weight = widget.entry.weight[index];
+                return Container(
+                  width: rowWidth,
+                  margin: EdgeInsets.only(top: topm, left: m, right: m),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(width: 3, color: Theme.of(ctxt).primaryColor, style: BorderStyle.solid),
+                    ),
+                    color: tertiaryColor,
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: rowWidth,
+                            height: 20,
+                            alignment: Alignment.center,
+                            child: Text(
+                              exercise.name,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: "Times New Roman",
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            width: rowWidth / 3,
+                            height: 15,
+                            alignment: Alignment.center,
+                            child:Text(
+                              "Sets",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: "Times New Roman",
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: rowWidth / 3,
+                            height: 15,
+                            alignment: Alignment.center,
+                            child:Text(
+                              "Reps",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: "Times New Roman",
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: rowWidth / 3,
+                            height: 15,
+                            alignment: Alignment.center,
+                            child:Text(
+                              "Weight",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: "Times New Roman",
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            width: rowWidth / 3,
+                            height: 15,
+                            alignment: Alignment.center,
+                            child:Text(
+                              sets.toString(),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: "Times New Roman",
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: rowWidth / 3,
+                            height: 15,
+                            alignment: Alignment.center,
+                            child:Text(
+                              reps.toString(),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: "Times New Roman",
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: rowWidth / 3,
+                            height: 15,
+                            alignment: Alignment.center,
+                            child:Text(
+                              weight.toString(),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: "Times New Roman",
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

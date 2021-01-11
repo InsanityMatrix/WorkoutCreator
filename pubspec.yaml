@@ -11,12 +11,13 @@ description: An App made to create workouts and learn about supplementation and 
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 3.0.1+7
+version: 3.0.2+8
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  launch_review: ^1.0.1
   url_launcher: ^5.7.10
   http: ^0.12.0+4
   multiselect_formfield: ^0.1.5

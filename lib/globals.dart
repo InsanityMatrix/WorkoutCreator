@@ -169,6 +169,9 @@ Exercise SQUEEZE_PRESS = new Exercise("Squeeze Press", CHEST, [TRICEPS], ["dumbb
 Exercise PLATE_PRESS = new Exercise("Plate Press", CHEST, [TRICEPS], ["barbell"]);
 Exercise PUSHUPS = new Exercise("Pushups", CHEST, [TRICEPS], ["calisthenics"]);
 Exercise FRONT_RAISE = new Exercise("Front Raise", DELTOIDS, null, ["dumbbell"]);
+Exercise TRICEP_PUSHDOWNS = new Exercise("Tricep Pushdowns", TRICEPS, null, ["cable"]);
+Exercise DUMBBELL_CURL = new Exercise("Dumbbell Curl", BICEPS, null, ["dumbbell"]);
+Exercise BARBELL_CURL = new Exercise("Barbell Curl", BICEPS, null, ["barbell"]);
 //Lower Body
 Exercise DEADLIFT = new Exercise("Deadlift", GLUTES, [QUADS, LATS, TRAPEZIUS], ["barbell", "dumbbell"]);
 Exercise ROMANIAN_DEADLIFT = new Exercise("Romanian Deadlifts", HAMSTRINGS, [GLUTES, QUADS], ["barbell","dumbbell"]);
@@ -182,6 +185,8 @@ Exercise LUNGES = new Exercise("Dumbbell Lunges", QUADS, [GLUTES, HAMSTRINGS], [
 Exercise LATERAL_LUNGES = new Exercise("Lateral Lunge", GLUTES, [QUADS], ["dumbbell", "calisthenics"]);
 Exercise LEG_CURL = new Exercise("Leg Curl", HAMSTRINGS, [CALVES], ["legmachine"]);
 Exercise LEG_EXTENSIONS = new Exercise("Leg Extensions", QUADS, null, ["legmachine"]);
+Exercise INCLINE_DUMBBELL_PRESS = new Exercise("Incline Dumbbell Press", CHEST, [DELTOIDS, TRICEPS], ["dumbbell"]);
+Exercise INCLINE_BENCHPRESS = new Exercise("Incline Benchpress", CHEST, [DELTOIDS, TRICEPS],["barbell"]);
 
 Exercise STANDING_CALF_RAISE = new Exercise("Standing Calf Raise", CALVES, null, ["barbell", "dumbbell","calisthenics"]);
 Exercise SEATED_CALF_RAISE = new Exercise("Seated Calf Raise", CALVES, null, ["dumbbell"]);
@@ -189,7 +194,8 @@ Exercise SEATED_CALF_RAISE = new Exercise("Seated Calf Raise", CALVES, null, ["d
 Exercise RUSSIAN_TWISTS = new Exercise("Russian Twists", OBLIQUES, [ABS], ["calisthenics"]);
 Exercise LEG_LIFTS = new Exercise("Leg Lifts", ABS, null, ["calisthenics"]);
 Exercise CRUNCHES = new Exercise("Crunches", ABS, null, ["calisthenics"]);
-
+Exercise REVERSE_CRUNCH = new Exercise("Reverse Crunch", ABS, null, ["calisthenics"]);
+Exercise PLANK = new Exercise("Plank", ABS, null, ["calisthenics"]);
 //Calisthenics
 Exercise INVERTED_ROWS = new Exercise("Inverted Rows", DELTOIDS, [LATS, RHOMBOIDS, BICEPS], ["calisthenics"]);
 Exercise BW_REAR_DELT_FLY = new Exercise("Bodyweight Rear Delt Fly", DELTOIDS, [RHOMBOIDS, TRAPEZIUS], ["calisthenics"]);
@@ -209,8 +215,9 @@ List<Exercise> EXERCISES = [
   PLATE_PRESS, RUSSIAN_TWISTS, LEG_LIFTS, CRUNCHES,STANDING_CALF_RAISE, 
   SEATED_CALF_RAISE, INVERTED_ROWS, BW_REAR_DELT_FLY, PIKE_PRESS, INVERTED_SHRUGS,
   BULGARIAN_SPLIT_SQUATS,SINGLE_LEG_DEADLIFT, LUNGES, LATERAL_LUNGES,INCLINE_DUMBBELL_CURL,SPIDER_CURLS,
-  ROMANIAN_DEADLIFT, HANGING_LEG_LIFTS, DUMBBELL_PULLOVERS,FACE_PULLS, FRONT_RAISE,
-  
+  ROMANIAN_DEADLIFT, HANGING_LEG_LIFTS, DUMBBELL_PULLOVERS,FACE_PULLS, FRONT_RAISE,INCLINE_DUMBBELL_PRESS,
+  INCLINE_BENCHPRESS,TRICEP_PUSHDOWNS,DUMBBELL_CURL,BARBELL_CURL, REVERSE_CRUNCH,
+  PLANK,
 ];
 
 Workout createWorkout(String name,int epm, List<int> selectedMuscles, Config config) {

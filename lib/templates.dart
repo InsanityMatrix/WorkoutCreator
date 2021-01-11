@@ -58,3 +58,65 @@ TemplateWorkout legs = new TemplateWorkout(
 List<TemplateWorkout> templateWorkouts = [
   push, pull, legs
 ];
+
+//CELEBRITY
+TemplateWorkout creed1 = new TemplateWorkout(
+  "Michael Jordan\'s Creed 1",
+  new Workout(
+    "Michael Jordan\'s Creed 1",
+    <Exercise>[
+      INCLINE_DUMBBELL_PRESS,
+      CHEST_FLY,
+      PUSHUPS,
+      TRICEP_KICKBACK,
+      TRICEP_PUSHDOWNS,
+      DIPS,
+    ],
+  ),
+);
+TemplateWorkout creed2 = new TemplateWorkout(
+  "Michael Jordan\'s Creed 2",
+  new Workout(
+    "Michael Jordan\'s Creed 2",
+    <Exercise>[
+      BENT_OVER_DUMBELL_ROW,
+      LAT_PULLDOWNS,
+      DUMBBELL_CURL,
+      BARBELL_CURL,
+      HAMMER_CURL,
+    ],
+  ),
+);
+TemplateWorkout creed3 = new TemplateWorkout(
+  "Michael Jordan\'s Creed 3",
+  new Workout(
+    "Michael Jordan\'s Creed 3",
+    <Exercise>[
+      LUNGES,
+      LEG_CURL,
+      ROMANIAN_DEADLIFT,
+      BACK_SQUAT,
+      CRUNCHES,
+      LEG_LIFTS,
+      REVERSE_CRUNCH,
+    ],
+  )
+);
+
+TemplateWorkout keanuReeves = new TemplateWorkout(
+  "Keanu Reeves",
+  new Workout(
+    "Keanu Reeves",
+    <Exercise>[
+        LUNGES,
+        SHOULDER_PRESS,
+        BENT_OVER_DUMBELL_ROW,
+        BACK_SQUAT,
+        PLANK,
+        LATERAL_LUNGES,
+    ],
+  ),
+);
+List<TemplateWorkout> celebrityWorkouts = [
+  creed1, creed2, creed3, keanuReeves,
+];
