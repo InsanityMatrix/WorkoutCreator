@@ -669,7 +669,7 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
     muscleList.add(getMenuItem(context, "Glutes", globals.GLUTES));
     muscleList.add(getMenuItem(context, "Quads", globals.QUADS));
     muscleList.add(getMenuItem(context, "Hamstrings", globals.HAMSTRINGS));
-    muscleList.add(getMenuItem(context, "Calves", globals.HAMSTRINGS));
+    muscleList.add(getMenuItem(context, "Calves", globals.CALVES));
     muscleList.add(getMenuItem(context, "Abs", globals.ABS));
     muscleList.add(getMenuItem(context, "Obliques", globals.OBLIQUES));
   }
