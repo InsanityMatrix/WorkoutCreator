@@ -1587,10 +1587,9 @@ class _WorkoutLogger extends State<WorkoutLogger> {
         width: rowWidth,
         margin: EdgeInsets.only(top: m * 2, left: m, right: m),
         decoration: BoxDecoration(
-          color: Colors.transparent,
-          border: Border(
-            bottom: BorderSide(color: Colors.grey[700]),
-          ),
+          color: Colors.white,
+          border: Border.all(color: Colors.white),
+          borderRadius: BorderRadius.all(Radius.circular(15)),
         ),
         child: Column(
           children: <Widget>[
@@ -1601,18 +1600,20 @@ class _WorkoutLogger extends State<WorkoutLogger> {
               ],
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Container(
-                  width: rowWidth / 3,
+                  width: rowWidth / 3.05,
                   child: TextFormField(
+                    textAlign: TextAlign.center,
                     controller: setControllers[i],
-                    style: Theme.of(context).textTheme.button,
-                    cursorColor: Colors.white,
+                    style: TextStyle(color: Colors.black),
+                    cursorColor: Colors.black,
                     decoration: const InputDecoration(
-                      labelText: 'Sets',
-                      labelStyle: TextStyle(color: Color(0xFFdbdbdb)),
+                      hintText: "Sets",
+                      hintStyle: TextStyle(color: Colors.grey),
                     ),
+                    
                     validator: (value) {
                       if(!isNumeric(value)) {
                         return 'This value needs to be a number!';
@@ -1624,14 +1625,16 @@ class _WorkoutLogger extends State<WorkoutLogger> {
                   ),
                 ),
                 Container(
-                  width: rowWidth / 3,
+                  width: rowWidth / 3.05,
                   child: TextFormField(
+                    textAlign: TextAlign.center,
                     controller: repControllers[i],
-                    style: Theme.of(context).textTheme.button,
-                    cursorColor: Colors.white,
+                    style: TextStyle(color: Colors.black),
+                    cursorColor: Colors.black,
                     decoration: const InputDecoration(
-                      labelText: 'Reps',
-                      labelStyle: TextStyle(color: Color(0xFFdbdbdb)),
+                      hintText: 'Reps',
+                      hintStyle: TextStyle(color: Colors.grey),
+                      
                     ),
                     validator: (value) {
                       if(!isNumeric(value)) {
@@ -1644,14 +1647,15 @@ class _WorkoutLogger extends State<WorkoutLogger> {
                   ),
                 ),
                 Container(
-                  width: rowWidth / 3,
+                  width: rowWidth / 3.05,
                   child: TextFormField(
+                    textAlign: TextAlign.center,
                     controller: weightControllers[i],
-                    style: Theme.of(context).textTheme.button,
-                    cursorColor: Colors.white,
+                    style: TextStyle(color: Colors.black),
+                    cursorColor: Colors.black,
                     decoration: const InputDecoration(
-                      labelText: 'Weight',
-                      labelStyle: TextStyle(color: Color(0xFFdbdbdb)),
+                      hintText: 'Weight',
+                      hintStyle: TextStyle(color: Colors.grey),
                     ),
                     validator: (value) {
                       if(!isNumeric(value)) {
@@ -1664,7 +1668,7 @@ class _WorkoutLogger extends State<WorkoutLogger> {
                   ),
                 ),
               ]
-            )
+            ),
           ],
         ),
       );
@@ -1788,11 +1792,11 @@ class _WorkoutLogger extends State<WorkoutLogger> {
       exercises.add(EXERCISES[0]);
     }
     return DropdownButton(
-      dropdownColor: Theme.of(context).accentColor,
+      dropdownColor: Colors.white,
       focusColor: Color(0xFF525252),
       items: exerciseList,
       hint: new Text('Select Exercise',
-        style: Theme.of(context).textTheme.button
+        style: TextStyle(color: Colors.black)
       ),
       value: exercises[index],
       onChanged: (value) {
@@ -1818,7 +1822,7 @@ class _WorkoutLogger extends State<WorkoutLogger> {
         child: new Text(
           exercise.name,
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.black,
             fontFamily: "Times New Roman",
           ),
         ),
@@ -1827,7 +1831,6 @@ class _WorkoutLogger extends State<WorkoutLogger> {
     });
   }
 }
-//TODO: Make Workout Log Entry Viewing Page
 class WorkoutEntry extends StatefulWidget {
   final WorkoutLog entry;
   WorkoutEntry({Key key, @required this.entry}) : super(key: key);

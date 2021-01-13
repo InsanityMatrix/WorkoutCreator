@@ -6,6 +6,7 @@ import 'package:workoutcreator/research.dart';
 import 'package:workoutcreator/information.dart';
 import 'package:workoutcreator/log.dart';
 import 'package:workoutcreator/globals.dart' as globals;
+import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'package:select_form_field/select_form_field.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
 
@@ -426,7 +427,7 @@ class _WorkoutCreation extends State<WorkoutCreation> {
             Container(
               color: Theme.of(context).accentColor,
               width: MediaQuery.of(context).size.width / 10 * 9,
-              margin: EdgeInsets.only(top: m*2, left: m, right: m),
+              margin: EdgeInsets.only(top: 20, left: m, right: m),
               child: ExpansionTile(
                 backgroundColor: Theme.of(context).accentColor,
                 title: Text(
@@ -450,7 +451,35 @@ class _WorkoutCreation extends State<WorkoutCreation> {
                   color: Theme.of(context).accentColor,
                   padding: EdgeInsets.all(5),
                   child: Text(
-                    "Create Custom Workout",
+                    "Add your own workout",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: "Times New Roman",
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              CustomWorkoutBuilder()),
+                    );
+                  }
+                ),
+              ),
+            ),
+            Container(height: 20),
+            Container(
+              color: Theme.of(context).accentColor,
+              width: MediaQuery.of(context).size.width / 10 * 9,
+              margin: EdgeInsets.only(left: m, right: m),
+              height: 50,
+              child: SizedBox.expand(
+                child: FlatButton(
+                  color: Theme.of(context).accentColor,
+                  padding: EdgeInsets.all(5),
+                  child: Text(
+                    "Generate Custom Workout",
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: "Times New Roman",
@@ -846,6 +875,181 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
   }
 }
 
+class CustomWorkoutBuilder extends StatefulWidget {
+  CustomWorkoutBuilder({Key key}) : super(key: key);
+
+  @override
+  _CustomWorkoutBuilder createState() => _CustomWorkoutBuilder();
+}
+class _CustomWorkoutBuilder extends State<CustomWorkoutBuilder> {
+  final _formKey = GlobalKey<FormState>();
+  final nameController = TextEditingController();
+  List<globals.Exercise> selectedItems = [];
+  List<DropdownMenuItem> items = [];
+  int exerciseButtons = 1;
+
+  Widget getExerciseColumn(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: getExerciseWidgets(context),
+    );
+  }
+  List<Widget> getExerciseWidgets(BuildContext context) {
+    List<Widget> widgets = [];
+    for (int i = 0; i < exerciseButtons; i++) {
+      widgets.add(getExerciseButton(i));
+    }
+    return widgets;
+  }
+  
+  Widget getExerciseButton(int index) {
+    if (selectedItems.length == index) {
+      selectedItems.add(globals.SHRUGS);
+    }
+    return Container(
+      //width: MediaQuery.of(context).size.width * .8,
+      margin: EdgeInsets.only(top: 10),
+      padding: EdgeInsets.all(0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.white),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: SearchableDropdown(
+        items: items,
+        value: selectedItems[index],
+        menuBackgroundColor: Colors.white,
+        hint: "Select one",
+        isCaseSensitiveSearch: false,
+        searchHint: new Text(
+          "Select one",
+          style:TextStyle(color: Colors.black),
+        ),
+        style: TextStyle(color: Colors.black, fontFamily: "Times New Roman"),
+        onChanged: (val) {
+          setState(() {
+            selectedItems[index] = val;
+          });
+        },
+        isExpanded: true,
+      ),
+    );
+  }
+  @override
+  Widget build(BuildContext context) {
+    loadExerciseList(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Add your workout', style: Theme.of(context).textTheme.button),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.grey,
+            height: 4.0,
+          ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
+      ),
+      backgroundColor: Theme.of(context).primaryColor,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Form(
+            key: _formKey,
+            child: Column(
+              children: <Widget>[
+                TextFormField(
+                  autocorrect: true,
+                  style: Theme.of(context).textTheme.button,
+                  cursorColor: Colors.white,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'You need to enter a workout name';
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Workout Name',
+                    labelStyle: TextStyle(color: Color(0xFFdbdbdb)),
+                    contentPadding: EdgeInsets.all(20.0),
+                  ),
+                  controller: nameController,
+     
+                ),
+                getExerciseColumn(context),
+                RaisedButton(
+                  color: Theme.of(context).accentColor,
+                  focusColor: Color(0xFF525252),
+                  child: Text("Add Another Exercise",
+                      style: Theme.of(context).textTheme.button),
+                  onPressed: () {
+                    setState(() {
+                      exerciseButtons += 1;
+                    });
+                  },
+                ),
+                RaisedButton(
+                  color: Theme.of(context).accentColor,
+                  focusColor: Color(0xFF525252),
+                  child: Text("Remove Last Exercise",
+                    style: Theme.of(context).textTheme.button
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      exerciseButtons -= 1;
+                      List<globals.Exercise> newSM = [];
+                      for(int i = 0; i < selectedItems.length - 1; i++) {
+                        newSM.add(selectedItems[i]);
+                      }
+                      selectedItems = newSM;
+                    });
+                  },
+                ),
+                RaisedButton(
+                  color: Theme.of(context).accentColor,
+                  focusColor: Color(0xFF525252),
+                  child: Text("Create Workout",
+                      style: Theme.of(context).textTheme.button),
+                  onPressed: () async {
+                    if (_formKey.currentState.validate()) {
+                      String name = nameController.text;
+                      globals.Workout workout = globals.Workout(name, selectedItems);
+                      await globals.saveWorkout(workout);
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                WorkoutPage(workout: workout)),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void loadExerciseList(BuildContext context) {
+    if(items.length > 2) {
+      return;
+    }
+    globals.EXERCISES.forEach((exercise) {
+      items.add(DropdownMenuItem(
+        child: new Text(
+          exercise.name,
+          style: TextStyle(
+            color: Colors.black,
+            fontFamily: "Times New Roman",
+          ),
+        ),
+        value: exercise,
+      ));
+    });
+  }
+}
 class WorkoutPage extends StatefulWidget {
   WorkoutPage({Key key, this.workout}) : super(key: key);
   //The title passed in from the home page

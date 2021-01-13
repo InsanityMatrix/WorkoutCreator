@@ -496,7 +496,7 @@ Workout createWorkout(String name,int epm, List<int> selectedMuscles, Config con
   saveWorkout(workout);
   return workout;
 }
-void saveWorkout(Workout workout) async {
+Future<void> saveWorkout(Workout workout) async {
   final directory = await getApplicationDocumentsDirectory();
   final path = directory.path;
   final wName = workout.getName() + ".json";

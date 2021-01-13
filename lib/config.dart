@@ -145,6 +145,32 @@ class _SettingsPage extends State<SettingsPage> {
               child: FlatButton(
                 color: tertiaryColor,
                 child: Text(
+                  "About",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: "Times New Roman",
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AboutPage()
+                    )
+                  );
+                }
+              )
+            )
+          ),
+          Container(
+            width: MediaQuery.of(context).size.width * .9,
+            margin: EdgeInsets.all(MediaQuery.of(context).size.width * .05),
+            color: tertiaryColor,
+            height: 50,
+            child: SizedBox.expand(
+              child: FlatButton(
+                color: tertiaryColor,
+                child: Text(
                   "Leave a Review!",
                   style: TextStyle(
                     color: Colors.white,
@@ -159,9 +185,138 @@ class _SettingsPage extends State<SettingsPage> {
                 }
               )
             )
-          )
+          ),
         ],
       ),
+    );
+  }
+}
+
+class AboutPage extends StatelessWidget {
+  const AboutPage({Key key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    double itemWidth = MediaQuery.of(context).size.width * .8;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("About",
+            style: Theme.of(context).textTheme.button),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.grey,
+            height: 4.0,
+          ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).pop();
+          }
+        ),
+      ),
+      backgroundColor: Theme.of(context).primaryColor,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(height: 50),
+          Container(
+            width: itemWidth,
+            padding: EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.white),
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  alignment: Alignment.center,
+                  width: itemWidth - 30,
+                  decoration: BoxDecoration(
+                    border: Border(bottom: BorderSide(color: Colors.grey, width: 2)),
+                  ),
+                  height: 80,
+                  child: Column(
+                    children: [
+                      Text(
+                        "Gym Brain",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: "Times New Roman",
+                          fontSize: 25,
+                        ),
+                      ),
+                      Text(
+                        "Workout Creator",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: "Times New Roman",
+                          fontSize: 18,
+                        ),
+                      ),
+                    ]
+                  )
+                ),
+                Container(
+                  width: itemWidth - 30,
+                  padding: EdgeInsets.all(10.0),
+                  alignment: Alignment.center,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Creator:",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontFamily: "Times New Roman",
+                            ),
+                          ),
+                          Text(
+                            "David Piedra",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 15,
+                              fontFamily: "Times New Roman",
+                            ),
+                          ),
+                        ]
+                      ),
+                      //Add other things
+                      Container(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Version:",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontFamily: "Times New Roman",
+                            ),
+                          ),
+                          Text(
+                            "2.2",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 15,
+                              fontFamily: "Times New Roman",
+                            ),
+                          ),
+                        ],
+                      )
+                    ]
+                  )
+                ),
+              ],
+            )
+          ),
+        ],
+      )
     );
   }
 }
