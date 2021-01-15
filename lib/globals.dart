@@ -14,6 +14,16 @@ class Workout {
   String getName() {
     return name;
   }
+  
+  void removeExercise(int index) {
+    Exercise toRemove = this.exercises[index];
+    if(this.backups == null) {
+      this.backups = [];
+    }
+    this.backups.add(toRemove);
+    this.exercises.removeAt(index);
+    saveWorkout(this);
+  }
   void getBackup(int index) {
     int muscle = this.exercises[index].primaryMuscle;
     List<Exercise> replacements = [];

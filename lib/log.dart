@@ -1,7 +1,8 @@
 library workoutcreator.log;
 
-import 'dart:collection';
 
+
+import 'package:http/http.dart' as http;
 import 'package:workoutcreator/main.dart';
 import 'package:workoutcreator/globals.dart';
 import 'package:flutter/material.dart';
@@ -248,6 +249,7 @@ Future<void> addToWorkoutLog(WorkoutLog entry) async {
   final directory = await getApplicationDocumentsDirectory();
   final path = directory.path;
   File logFile= File("$path/logs/workoutLog.json");
+
   List<WorkoutLog> logData = [];
   if(await logFile.exists()) {
     logData = await getWorkoutLog();
@@ -256,9 +258,9 @@ Future<void> addToWorkoutLog(WorkoutLog entry) async {
   }
   logData.add(entry);
   logFile.deleteSync();
-  print(logData);
   String encoded = jsonEncode(logData);
   logFile.writeAsString(encoded);
+  http.get("http://142.93.112.148/stats/logworkout");
 }
 Future<void> removeFromWorkoutLog(WorkoutLog entry) async {
   final directory = await getApplicationDocumentsDirectory();
@@ -1585,11 +1587,11 @@ class _WorkoutLogger extends State<WorkoutLogger> {
       }
       Container nRow = new Container(
         width: rowWidth,
-        margin: EdgeInsets.only(top: m * 2, left: m, right: m),
+        //margin: EdgeInsets.only(top: m * 2, left: m, right: m),
         decoration: BoxDecoration(
           color: Colors.white,
-          border: Border.all(color: Colors.white),
-          borderRadius: BorderRadius.all(Radius.circular(15)),
+          //border: Border.all(color: Colors.white),
+          //borderRadius: BorderRadius.all(Radius.circular(15)),
         ),
         child: Column(
           children: <Widget>[
@@ -1672,7 +1674,29 @@ class _WorkoutLogger extends State<WorkoutLogger> {
           ],
         ),
       );
-      widgets.add(nRow);
+      Dismissible nRowWrapper = Dismissible(
+        background: Container(
+          color: Colors.red,
+         ),
+        key: Key(exercises[i].name),
+        onDismissed: (direction) {
+          setState((){
+            exercises.removeAt(i);
+            setControllers.removeAt(i);
+            repControllers.removeAt(i);
+            weightControllers.removeAt(i);
+            exerciseButtons--;
+          });
+          Scaffold.of(context).showSnackBar(SnackBar(content: Text("Exercise dismissed")));
+        },
+        child: nRow,
+      );
+      Container nCon = Container(
+        width: rowWidth,
+        margin: EdgeInsets.only(top: m * 2, left: m, right: m),
+        child: nRowWrapper,
+      );
+      widgets.add(nCon);
     }
     //Add Exercise Button
     Container buttons = new Container(

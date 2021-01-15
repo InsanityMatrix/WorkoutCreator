@@ -1059,6 +1059,13 @@ class WorkoutPage extends StatefulWidget {
 }
 
 class _WorkoutPageState extends State<WorkoutPage> {
+  globals.Workout workout;
+
+  @override
+  void initState() {
+    super.initState();
+    workout = widget.workout;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1098,23 +1105,23 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   List<Widget> buildExerciseList() {
     List<Widget> ls = [];
-    for (int i = 0; i < widget.workout.exercises.length; i++) {
+    for (int i = 0; i < workout.exercises.length; i++) {
       Widget addition = Card(
         color: tertiaryColor,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             ListTile(
-              title: Text(widget.workout.exercises[i].name,
+              title: Text(workout.exercises[i].name,
                   style: Theme.of(context).textTheme.button),
-              subtitle: Text(widget.workout.exercises[i].subtitle(),
+              subtitle: Text(workout.exercises[i].subtitle(),
                   style: Theme.of(context).textTheme.subtitle1),
               trailing: IconButton(
                 icon: Icon(Icons.refresh),
                 color: Colors.white,
                 onPressed: () {
                   setState(() {
-                    widget.workout.getBackup(i);
+                    workout.getBackup(i);
                   });
                 },
               ),
@@ -1122,7 +1129,60 @@ class _WorkoutPageState extends State<WorkoutPage> {
           ],
         ),
       );
-      ls.add(addition);
+      Dismissible dis = Dismissible(
+        key: Key(workout.exercises[i].name),
+        background: Container(color: Colors.red),
+        direction: DismissDirection.endToStart,
+        confirmDismiss: (direction) {
+          return showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              backgroundColor: Theme.of(ctx).accentColor,
+              title: Text(
+                'Are you sure?',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              content: Text(
+                'Do you want to remove this exercise?',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              actions: <Widget>[
+                FlatButton(
+                  color: tertiaryColor,
+                  child: Text(
+                    'No',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () {
+                    Navigator.of(ctx).pop(false);
+                  },
+                ),
+                FlatButton(
+                  color: tertiaryColor,
+                  child: Text(
+                    'Yes',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () {
+                    Navigator.of(ctx).pop(true);
+                  },
+                ),
+              ]
+            ),
+          );
+        },
+        onDismissed: (direction) {
+          setState(() {
+            workout.removeExercise(i);
+          });
+        },
+        child: addition,
+      );
+      ls.add(dis);
     }
 
     ls.add(IconButton(

@@ -8,6 +8,7 @@ import 'dart:io';
 
 String url = "http://142.93.112.148/file/";
 List<String> sections = [
+ // "Nutrition",
   "Supplementation",
   "Pre-Workouts",
   "Beginner Questions",
@@ -41,6 +42,10 @@ void setupResearch() async {
       spFile.writeAsString(val);
     });
 
+    //getNutritionFile().then((val) {
+      //File nFile = File('$path/research/Nutrition.txt');
+     // nFile.writeAsString(val);
+    //});
   } else {
     //Make Sure every file exists
     
@@ -72,6 +77,15 @@ void setupResearch() async {
         spFile.writeAsString(val);
       });
     }
+
+    //Nutrition File
+    //File nFile = File('$path/research/Nutrition.txt');
+    //exists = await nFile.exists();
+    //if(!exists) {
+      //getNutritionFile().then((val) {
+       // nFile.writeAsString(val);
+      //});
+    //}
   }
 }
 
@@ -79,7 +93,11 @@ List<String> supplements = [
   "Creatine", "Ashwagandha", "L-Citrulline", "Glycerol", "Beta-Alanine",
   "Caffiene", "Theacrine",
 ];
-
+Future<String> getNutritionFile() async {
+  String urlP = url + "Nutrition";
+  var response = await http.get(urlP);
+  return response.body;
+}
 Future<String> getSupplementFile(String supplement) async {
   String urlP = url + supplement;
   var response = await http.get(urlP);
