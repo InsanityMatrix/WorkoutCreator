@@ -32,6 +32,12 @@ Color tertiaryColor = new Color(0xFF52689c);
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+  Future<bool> config;
+  @override
+  void initState() {
+    config = configExists();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -48,7 +54,7 @@ class MyApp extends StatelessWidget {
               color: Color(0xFFFFFFFF),
             )),
       ),
-      home: MyHomePage(title: 'Home', index: 0),
+      home: MyHomePage(title: "Home", index: 0),
     );
   }
 }
@@ -239,8 +245,26 @@ class _WorkoutCreatorPage extends State<WorkoutCreatorPage> {
                         }
                       }
                     } else {
-                      //TODO: Change to a good no workouts design
-                      children.add(Text("No Saved Workouts"));
+                      children.add(
+                        Container(
+                          width: rowWidth / 2,
+                          margin: EdgeInsets.only(
+                              left: m * 3, right: m * 3, top: 10, bottom: 10),
+                          decoration: BoxDecoration(
+                            color: tertiaryColor,
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
+                          height: 30,
+                          child: Text(
+                            "No Saved Workouts",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontFamily: "Times New Roman",
+                            ),
+                          ),
+                        ),
+                      );
                     }
                   } else {
                     children.add(Text("Error"));

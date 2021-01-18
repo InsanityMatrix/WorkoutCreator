@@ -42,50 +42,37 @@ void setupResearch() async {
       spFile.writeAsString(val);
     });
 
-    //getNutritionFile().then((val) {
-    //File nFile = File('$path/research/Nutrition.txt');
-    // nFile.writeAsString(val);
-    //});
+    getNutritionFile().then((val) {
+      File nFile = File('$path/research/Nutrition.txt');
+      nFile.writeAsString(val);
+    });
   } else {
-    //Make Sure every file exists
-
+    //Make Sure every file exists & download updates
     //Start With Supplements
     supplements.forEach((supp) {
       File sFile = File('$path/research/$supp.txt');
-      bool exists = sFile.existsSync();
 
-      if (!exists) {
-        //if file does not exist, download it
-        getSupplementFile(supp).then((val) {
-          sFile.writeAsString(val);
-        });
-      }
+      //if file does not exist, download it
+      getSupplementFile(supp).then((val) {
+        sFile.writeAsString(val);
+      });
     });
     //Questions File
     File qFile = File('$path/research/Questions.txt');
-    bool exists = await qFile.exists();
-    if (!exists) {
-      getQuestionsFile().then((val) {
-        qFile.writeAsString(val);
-      });
-    }
+    getQuestionsFile().then((val) {
+      qFile.writeAsString(val);
+    });
     //StrengthPrograms File
     File spFile = File('$path/research/StrengthPrograms.txt');
-    exists = await spFile.exists();
-    if (!exists) {
-      getStrengthProgramsFile().then((val) {
-        spFile.writeAsString(val);
-      });
-    }
+    getStrengthProgramsFile().then((val) {
+      spFile.writeAsString(val);
+    });
 
     //Nutrition File
-    //File nFile = File('$path/research/Nutrition.txt');
-    //exists = await nFile.exists();
-    //if(!exists) {
-    //getNutritionFile().then((val) {
-    // nFile.writeAsString(val);
-    //});
-    //}
+    File nFile = File('$path/research/Nutrition.txt');
+    getNutritionFile().then((val) {
+      nFile.writeAsString(val);
+    });
   }
 }
 
@@ -149,17 +136,39 @@ Future<List<Question>> getQuestions() async {
   var decoded = jsonDecode(json);
   //print(decoded);
   decoded.forEach((q) {
-    print(q);
     String question = q['Question'];
-    print("question: " + question);
     String answer = q['Answer'];
-    print("answer: " + answer);
     Question que = Question(question, answer);
-    print("question: " + que.toString());
     questions.add(que);
   });
 
   return questions;
+}
+
+class NutritionInfo {
+  String title, content;
+  NutritionInfo(this.title, this.content);
+
+  Map<String, String> toJson() => {
+        'Title': title,
+        'Content': content,
+      };
+}
+
+Future<List<NutritionInfo>> getNutritionInfo() async {
+  List<NutritionInfo> info = [];
+  final directory = await getApplicationDocumentsDirectory();
+  final path = directory.path;
+  File nFile = File('$path/research/Nutrition.txt');
+  String json = await nFile.readAsString();
+  var decoded = jsonDecode(json);
+  decoded.forEach((n) {
+    String title = n['Title'];
+    String content = n['Content'];
+    NutritionInfo i = NutritionInfo(title, content);
+    info.add(i);
+  });
+  return info;
 }
 
 class StrengthProgram {
