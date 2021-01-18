@@ -14,7 +14,7 @@ class Workout {
   String getName() {
     return name;
   }
-  
+
   void removeExercise(int index) {
     Exercise toRemove = this.exercises[index];
     if(this.backups == null) {
@@ -212,7 +212,7 @@ Exercise BW_REAR_DELT_FLY = new Exercise("Bodyweight Rear Delt Fly", DELTOIDS, [
 Exercise PIKE_PRESS = new Exercise("Pike Press", DELTOIDS, [TRICEPS], ["calisthenics"]);
 Exercise INVERTED_SHRUGS = new Exercise("Inverted Shrugs", TRAPEZIUS, [], ["calisthenics"]);
 Exercise HANGING_LEG_LIFTS = new Exercise("Hanging Leg Lifts", ABS, [], ["pullupbar", "calisthenics"]);
-
+Exercise SINGLE_LEG_GLUTE_BRIDGE = new Exercise("Single-Leg Glute Bridge", GLUTES, [], ["calisthenics"]);
 
 
 List<Exercise> EXERCISES = [
@@ -227,7 +227,7 @@ List<Exercise> EXERCISES = [
   BULGARIAN_SPLIT_SQUATS,SINGLE_LEG_DEADLIFT, LUNGES, LATERAL_LUNGES,INCLINE_DUMBBELL_CURL,SPIDER_CURLS,
   ROMANIAN_DEADLIFT, HANGING_LEG_LIFTS, DUMBBELL_PULLOVERS,FACE_PULLS, FRONT_RAISE,INCLINE_DUMBBELL_PRESS,
   INCLINE_BENCHPRESS,TRICEP_PUSHDOWNS,DUMBBELL_CURL,BARBELL_CURL, REVERSE_CRUNCH,
-  PLANK,
+  PLANK,SINGLE_LEG_GLUTE_BRIDGE,
 ];
 
 Workout createWorkout(String name,int epm, List<int> selectedMuscles, Config config) {

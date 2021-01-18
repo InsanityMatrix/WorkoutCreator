@@ -31,6 +31,11 @@ Config mainConfig;
 Color tertiaryColor = new Color(0xFF52689c);
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+  Future<bool> config;
+  @override
+  void initState() {
+    config = configExists();
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -47,7 +52,7 @@ class MyApp extends StatelessWidget {
               color: Color(0xFFFFFFFF),
             )),
       ),
-      home: MyHomePage(title: 'Home', index: 0),
+      home: MyHomePage(title: "Home", index: 0),
     );
   }
 }
