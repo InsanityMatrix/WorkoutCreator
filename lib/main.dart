@@ -9,6 +9,7 @@ import 'package:workoutcreator/globals.dart' as globals;
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'package:select_form_field/select_form_field.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
+import 'package:http/http.dart' as http;
 
 void main() => runApp(MyApp());
 const int _blackPrimaryValue = 0xFF000000;
@@ -247,14 +248,15 @@ class _WorkoutCreatorPage extends State<WorkoutCreatorPage> {
                     } else {
                       children.add(
                         Container(
-                          width: rowWidth / 2,
+                          alignment: Alignment.center,
+                          width: rowWidth,
                           margin: EdgeInsets.only(
-                              left: m * 3, right: m * 3, top: 10, bottom: 10),
+                              left: m, right: m, top: 10, bottom: 10),
                           decoration: BoxDecoration(
                             color: tertiaryColor,
                             borderRadius: BorderRadius.all(Radius.circular(8)),
                           ),
-                          height: 30,
+                          height: 40,
                           child: Text(
                             "No Saved Workouts",
                             style: TextStyle(
@@ -364,6 +366,7 @@ class _WorkoutCreation extends State<WorkoutCreation> {
               ),
               onPressed: () async {
                 globals.saveWorkout(workout.workout);
+                http.get("http://142.93.112.148/stats/createworkout");
                 Navigator.of(context).popUntil((route) => route.isFirst);
                 Navigator.pushReplacement(
                   context,
@@ -404,6 +407,7 @@ class _WorkoutCreation extends State<WorkoutCreation> {
               ),
               onPressed: () async {
                 globals.saveWorkout(workout.workout);
+                http.get("http://142.93.112.148/stats/createworkout");
                 Navigator.of(context).popUntil((route) => route.isFirst);
                 Navigator.pushReplacement(
                   context,
@@ -700,6 +704,7 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
 
                       globals.Workout workout = globals.createWorkout(
                           name, epm, muscleChoices, mainConfig);
+                      http.get("http://142.93.112.148/stats/createworkout");
                       Navigator.of(context).popUntil((route) => route.isFirst);
                       Navigator.pushReplacement(
                         context,
@@ -1050,6 +1055,7 @@ class _CustomWorkoutBuilder extends State<CustomWorkoutBuilder> {
                       globals.Workout workout =
                           globals.Workout(name, selectedItems);
                       await globals.saveWorkout(workout);
+                      http.get("http://142.93.112.148/stats/createworkout");
                       Navigator.of(context).popUntil((route) => route.isFirst);
                       Navigator.pushReplacement(
                         context,
