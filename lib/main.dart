@@ -29,6 +29,7 @@ const MaterialColor primaryBlack = MaterialColor(
 );
 Config mainConfig;
 Color tertiaryColor = new Color(0xFF52689c);
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -51,6 +52,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title, this.index}) : super(key: key);
   final String title;
@@ -71,14 +73,12 @@ class _MyHomePage extends State<MyHomePage> {
       _currentIndex = widget.index;
     });
     configExists().then((bool data) {
-      if(!data) {
+      if (!data) {
         Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  SetupPage(),
-          )
-        );
+            context,
+            MaterialPageRoute(
+              builder: (context) => SetupPage(),
+            ));
       } else {
         getConfig().then((Config config) {
           mainConfig = config;
@@ -86,13 +86,14 @@ class _MyHomePage extends State<MyHomePage> {
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
-    if(_currentIndex == 0) {
+    if (_currentIndex == 0) {
       bodyWidget = new WorkoutCreatorPage();
-    } else if(_currentIndex == 1) {
+    } else if (_currentIndex == 1) {
       bodyWidget = new ResearchHomePage();
-    } else if(_currentIndex == 2) {
+    } else if (_currentIndex == 2) {
       bodyWidget = new LogHome();
     }
     return Scaffold(
@@ -108,7 +109,7 @@ class _MyHomePage extends State<MyHomePage> {
           preferredSize: Size.fromHeight(4.0),
         ),
         //Settings
-        actions: <Widget> [
+        actions: <Widget>[
           Padding(
             padding: EdgeInsets.only(right: 20.0),
             child: GestureDetector(
@@ -116,8 +117,7 @@ class _MyHomePage extends State<MyHomePage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          SettingsPage(),
+                    builder: (context) => SettingsPage(),
                   ),
                 );
               },
@@ -150,7 +150,7 @@ class _MyHomePage extends State<MyHomePage> {
   }
 
   void onTapBar(int index) {
-    if(index == 0) {
+    if (index == 0) {
       setState(() {
         bodyWidget = new WorkoutCreatorPage();
         _currentIndex = 0;
@@ -179,80 +179,86 @@ class WorkoutCreatorPage extends StatefulWidget {
 }
 
 class _WorkoutCreatorPage extends State<WorkoutCreatorPage> {
- 
   @override
   void initState() {
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-    
+    double rowWidth = MediaQuery.of(context).size.width * .8;
+    double m = MediaQuery.of(context).size.width * .1;
     return Container(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                FutureBuilder<List<String>>(
-                  future: globals.getWorkouts(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<String>> snapshot) {
-                    List<Widget> children = [];
-                    if (snapshot.hasData) {
-                      if (snapshot.data == null) {
-                        children.add(Text("No Workouts"));
-                      } else if (snapshot.data.length > 0) {
-                        for (int i = 0; i < snapshot.data.length; i++) {
-                          if (snapshot.data[i] != null) {
-                            Widget addition = Card(
-                              color: tertiaryColor,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  ListTile(
-                                    title: Text(snapshot.data[i],
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .button),
-                                    trailing: IconButton(
-                                      icon: Icon(Icons.arrow_right),
-                                      onPressed: () {
-                                        String fileName =
-                                            snapshot.data[i] + ".json";
-                                        Future<globals.Workout> workout =
-                                            globals.getWorkout(fileName);
-                                        workout.then((data) {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    WorkoutPage(
-                                                        workout: data)),
-                                          );
-                                        });
-                                      },
-                                    ),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            FutureBuilder<List<String>>(
+                future: globals.getWorkouts(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<String>> snapshot) {
+                  List<Widget> children = [];
+
+                  if (snapshot.hasData) {
+                    if (snapshot.data == null) {
+                      children.add(Text("No Workouts"));
+                    } else if (snapshot.data.length > 0) {
+                      for (int i = 0; i < snapshot.data.length; i++) {
+                        if (snapshot.data[i] != null) {
+                          Widget addition = Card(
+                            color: tertiaryColor,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                ListTile(
+                                  title: Text(snapshot.data[i],
+                                      style:
+                                          Theme.of(context).textTheme.button),
+                                  trailing: IconButton(
+                                    icon: Icon(Icons.arrow_right),
+                                    onPressed: () {
+                                      String fileName =
+                                          snapshot.data[i] + ".json";
+                                      Future<globals.Workout> workout =
+                                          globals.getWorkout(fileName);
+                                      workout.then((data) {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  WorkoutPage(workout: data)),
+                                        );
+                                      });
+                                    },
                                   ),
-                                ],
-                              ),
-                            );
-                            children.add(addition);
-                          }
+                                ),
+                              ],
+                            ),
+                          );
+                          children.add(addition);
                         }
-                      } else {
-                        children.add(Text("No Saved Workouts"));
                       }
                     } else {
-                      children.add(Text("Error"));
+                      //TODO: Change to a good no workouts design
+                      children.add(Text("No Saved Workouts"));
                     }
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: children,
-                    );
-                  }),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    RaisedButton(
+                  } else {
+                    children.add(Text("Error"));
+                  }
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: children,
+                  );
+                }),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  width: rowWidth,
+                  height: 40,
+                  margin: EdgeInsets.only(left: m, right: m, bottom: 15),
+                  child: SizedBox.expand(
+                    child: RaisedButton(
                       color: Theme.of(context).accentColor,
                       child: Text(
                         "+ Create Workout",
@@ -266,125 +272,136 @@ class _WorkoutCreatorPage extends State<WorkoutCreatorPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  WorkoutCreation()),
+                              builder: (context) => WorkoutCreation()),
                         );
                       },
                     ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    FlatButton(
-                      color: Theme.of(context).accentColor,
-                      padding: EdgeInsets.all(5),
-                      child: Icon(Icons.refresh, color: Colors.white),
-                      onPressed: () {
-                        setState((){});
-                      }
-                    )
-                  ]
+                  ),
                 ),
               ],
             ),
-          ),
-        );
+            Container(
+              width: rowWidth,
+              margin: EdgeInsets.only(left: m, right: m, top: 0, bottom: 0),
+              child:
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Container(
+                  margin: EdgeInsets.all(0),
+                  width: rowWidth,
+                  height: 40,
+                  child: SizedBox.expand(
+                    child: FlatButton(
+                        color: Theme.of(context).accentColor,
+                        child: Icon(Icons.refresh, color: Colors.white),
+                        onPressed: () {
+                          setState(() {});
+                        }),
+                  ),
+                ),
+              ]),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
+
 class WorkoutCreation extends StatefulWidget {
   WorkoutCreation({Key key}) : super(key: key);
 
   @override
   _WorkoutCreation createState() => _WorkoutCreation();
 }
+
 class _WorkoutCreation extends State<WorkoutCreation> {
   List<Widget> getTemplateWorkouts(BuildContext context) {
     double rowWidth = MediaQuery.of(context).size.width * 9;
     List<Container> rows = [];
     templateWorkouts.forEach((workout) {
       Container newRow = Container(
-        decoration: BoxDecoration(
-          color: tertiaryColor,
-          border: Border(
-            bottom: BorderSide(color: Colors.grey[700]),
-          ),
-        ),
-        width: rowWidth,
-        height: 50,
-        child: SizedBox.expand(
-          child: FlatButton(
+          decoration: BoxDecoration(
             color: tertiaryColor,
-            child: Text(
-              workout.name,
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: "Times New Roman",
-              ),
+            border: Border(
+              bottom: BorderSide(color: Colors.grey[700]),
             ),
-            onPressed: () async {
-              globals.saveWorkout(workout.workout);
-              Navigator.of(context).popUntil((route) => route.isFirst);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        WorkoutPage(workout: workout.workout)),
-              );
-            },
           ),
-        )
-      );
+          width: rowWidth,
+          height: 50,
+          child: SizedBox.expand(
+            child: FlatButton(
+              color: tertiaryColor,
+              child: Text(
+                workout.name,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: "Times New Roman",
+                ),
+              ),
+              onPressed: () async {
+                globals.saveWorkout(workout.workout);
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          WorkoutPage(workout: workout.workout)),
+                );
+              },
+            ),
+          ));
       rows.add(newRow);
     });
     return rows;
   }
+
   List<Widget> getCelebrityWorkouts(BuildContext context) {
     double rowWidth = MediaQuery.of(context).size.width * 9;
     List<Container> rows = [];
     celebrityWorkouts.forEach((workout) {
       Container newRow = Container(
-        decoration: BoxDecoration(
-          color: tertiaryColor,
-          border: Border(
-            bottom: BorderSide(color: Colors.grey[700]),
-          ),
-        ),
-        width: rowWidth,
-        height: 50,
-        child: SizedBox.expand(
-          child: FlatButton(
+          decoration: BoxDecoration(
             color: tertiaryColor,
-            child: Text(
-              workout.name,
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: "Times New Roman",
-              ),
+            border: Border(
+              bottom: BorderSide(color: Colors.grey[700]),
             ),
-            onPressed: () async {
-              globals.saveWorkout(workout.workout);
-              Navigator.of(context).popUntil((route) => route.isFirst);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        WorkoutPage(workout: workout.workout)),
-              );
-            },
           ),
-        )
-      );
+          width: rowWidth,
+          height: 50,
+          child: SizedBox.expand(
+            child: FlatButton(
+              color: tertiaryColor,
+              child: Text(
+                workout.name,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: "Times New Roman",
+                ),
+              ),
+              onPressed: () async {
+                globals.saveWorkout(workout.workout);
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          WorkoutPage(workout: workout.workout)),
+                );
+              },
+            ),
+          ));
       rows.add(newRow);
     });
     return rows;
   }
+
   @override
   Widget build(BuildContext context) {
     double m = MediaQuery.of(context).size.width / 20;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Workout Creation", style: Theme.of(context).textTheme.button),
+        title:
+            Text("Workout Creation", style: Theme.of(context).textTheme.button),
         bottom: PreferredSize(
           child: Container(
             color: Colors.grey,
@@ -409,37 +426,35 @@ class _WorkoutCreation extends State<WorkoutCreation> {
         child: ListView(
           children: <Widget>[
             Container(
-              color: Theme.of(context).accentColor,
-              width: MediaQuery.of(context).size.width / 10 * 9,
-              margin: EdgeInsets.only(top: m*2, left: m, right: m),
-              child: ExpansionTile(
-                backgroundColor: Theme.of(context).accentColor,
-                title: Text(
-                  "Templates",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: "Times New Roman",
+                color: Theme.of(context).accentColor,
+                width: MediaQuery.of(context).size.width / 10 * 9,
+                margin: EdgeInsets.only(top: m * 2, left: m, right: m),
+                child: ExpansionTile(
+                  backgroundColor: Theme.of(context).accentColor,
+                  title: Text(
+                    "Templates",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: "Times New Roman",
+                    ),
                   ),
-                ),
-                children: getTemplateWorkouts(context),
-              )
-            ),
+                  children: getTemplateWorkouts(context),
+                )),
             Container(
-              color: Theme.of(context).accentColor,
-              width: MediaQuery.of(context).size.width / 10 * 9,
-              margin: EdgeInsets.only(top: 20, left: m, right: m),
-              child: ExpansionTile(
-                backgroundColor: Theme.of(context).accentColor,
-                title: Text(
-                  "Celebrity Workouts",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: "Times New Roman",
+                color: Theme.of(context).accentColor,
+                width: MediaQuery.of(context).size.width / 10 * 9,
+                margin: EdgeInsets.only(top: 20, left: m, right: m),
+                child: ExpansionTile(
+                  backgroundColor: Theme.of(context).accentColor,
+                  title: Text(
+                    "Celebrity Workouts",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: "Times New Roman",
+                    ),
                   ),
-                ),
-                children: getCelebrityWorkouts(context),
-              )
-            ),
+                  children: getCelebrityWorkouts(context),
+                )),
             Container(height: 20),
             Container(
               color: Theme.of(context).accentColor,
@@ -448,24 +463,22 @@ class _WorkoutCreation extends State<WorkoutCreation> {
               height: 50,
               child: SizedBox.expand(
                 child: FlatButton(
-                  color: Theme.of(context).accentColor,
-                  padding: EdgeInsets.all(5),
-                  child: Text(
-                    "Add your own workout",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: "Times New Roman",
+                    color: Theme.of(context).accentColor,
+                    padding: EdgeInsets.all(5),
+                    child: Text(
+                      "Add your own workout",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: "Times New Roman",
+                      ),
                     ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              CustomWorkoutBuilder()),
-                    );
-                  }
-                ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CustomWorkoutBuilder()),
+                      );
+                    }),
               ),
             ),
             Container(height: 20),
@@ -476,33 +489,32 @@ class _WorkoutCreation extends State<WorkoutCreation> {
               height: 50,
               child: SizedBox.expand(
                 child: FlatButton(
-                  color: Theme.of(context).accentColor,
-                  padding: EdgeInsets.all(5),
-                  child: Text(
-                    "Generate Custom Workout",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: "Times New Roman",
+                    color: Theme.of(context).accentColor,
+                    padding: EdgeInsets.all(5),
+                    child: Text(
+                      "Generate Custom Workout",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: "Times New Roman",
+                      ),
                     ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              WorkoutBuilderPage(title: "Workout Builder")),
-                    );
-                  }
-                ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                WorkoutBuilderPage(title: "Workout Builder")),
+                      );
+                    }),
               ),
             ),
-            
           ],
         ),
       ),
     );
   }
 }
+
 class WorkoutBuilderPage extends StatefulWidget {
   WorkoutBuilderPage({Key key, this.title}) : super(key: key);
   //The title passed in from the home page
@@ -589,24 +601,24 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                     contentPadding: EdgeInsets.all(20.0),
                   ),
                   controller: nameController,
-     
                 ),
                 Container(
-                  alignment: Alignment(0,0),
+                  alignment: Alignment(0, 0),
                   width: MediaQuery.of(context).size.width,
                   padding: EdgeInsets.only(left: 20, right: 20),
                   child: TextField(
-                    decoration: new InputDecoration(labelText: "Exercises Per Muscle Group", labelStyle: TextStyle(color: Colors.white)),
+                    decoration: new InputDecoration(
+                        labelText: "Exercises Per Muscle Group",
+                        labelStyle: TextStyle(color: Colors.white)),
                     keyboardType: TextInputType.number,
                     onChanged: (val) {
-                      if(val == "") {
+                      if (val == "") {
                         return;
                       }
                       int value = int.parse(val);
-                      if(value > 0) {
+                      if (value > 0) {
                         FocusScope.of(context).unfocus();
                       }
-
                     },
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly
@@ -632,13 +644,12 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                   color: Theme.of(context).accentColor,
                   focusColor: Color(0xFF525252),
                   child: Text("Remove Last Muscle (group)",
-                    style: Theme.of(context).textTheme.button
-                  ),
+                      style: Theme.of(context).textTheme.button),
                   onPressed: () {
                     setState(() {
                       muscleGroupButtons -= 1;
                       List<int> newSM = [];
-                      for(int i = 0; i < selectedMuscles.length - 1; i++) {
+                      for (int i = 0; i < selectedMuscles.length - 1; i++) {
                         newSM.add(selectedMuscles[i]);
                       }
                       selectedMuscles = newSM;
@@ -655,7 +666,7 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                       String name = nameController.text;
                       String epmString = epmController.text;
                       int epm = int.parse(epmString);
-                      if(epm == 0) {
+                      if (epm == 0) {
                         epm = 1;
                       }
                       List<int> muscleChoices = [];
@@ -663,8 +674,8 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                         muscleChoices.add(selectedMuscles[i]);
                       }
 
-                      globals.Workout workout =
-                          globals.createWorkout(name,epm, muscleChoices, mainConfig);
+                      globals.Workout workout = globals.createWorkout(
+                          name, epm, muscleChoices, mainConfig);
                       Navigator.of(context).popUntil((route) => route.isFirst);
                       Navigator.pushReplacement(
                         context,
@@ -702,38 +713,48 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
     muscleList.add(getMenuItem(context, "Abs", globals.ABS));
     muscleList.add(getMenuItem(context, "Obliques", globals.OBLIQUES));
   }
+
   Map<String, String> licenseMap = {
-    "Rhomboids":"By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
-    "Trapezius":"By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
-    "Deltoids":"By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
-    "Triceps":"By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
-    "Biceps":"By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
-    "Lats":"By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
-    "Chest":"By Tarawneh licensed under Attribution-Share Alike 3.0 Unported",
-    "Glutes":"By Anvandare Chrizz licensed under Attribution-Share Alike 3.0 Unported",
-    "Quads":"By he.wikipedia licensed under Attribution-Share Alike 3.0 Unported",
-    "Hamstrings": "By BruceBlaus licensed under Attribution-Share Alike 4.0 International",
+    "Rhomboids":
+        "By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
+    "Trapezius":
+        "By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
+    "Deltoids":
+        "By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
+    "Triceps":
+        "By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
+    "Biceps":
+        "By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
+    "Lats": "By Anatomography licensed under Attribution-Share Alike 2.1 Japan",
+    "Chest": "By Tarawneh licensed under Attribution-Share Alike 3.0 Unported",
+    "Glutes":
+        "By Anvandare Chrizz licensed under Attribution-Share Alike 3.0 Unported",
+    "Quads":
+        "By he.wikipedia licensed under Attribution-Share Alike 3.0 Unported",
+    "Hamstrings":
+        "By BruceBlaus licensed under Attribution-Share Alike 4.0 International",
     "Calves": "By welcomeimages licensed under Attribution 4.0 International",
   };
-  DropdownMenuItem<int> getMenuItem(BuildContext context, String muscleName, int muscle) {
+  DropdownMenuItem<int> getMenuItem(
+      BuildContext context, String muscleName, int muscle) {
     Widget child1;
-    if(muscleName == "Abs" || muscleName == "Obliques") {
+    if (muscleName == "Abs" || muscleName == "Obliques") {
       child1 = Container();
-    } else if(muscleName == "Rhomboids") {
+    } else if (muscleName == "Rhomboids") {
       child1 = FlatButton(
-        padding: EdgeInsets.all(0),
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        child: Icon(
-          Icons.info_outline,
-          color: Colors.white,
-        ),
-        color: Colors.transparent,
-        onPressed: () async {
-          await showDialog(
-            context: context,
-            builder: (ctxt) {
-              return Dialog(
-                child: Container(
+          padding: EdgeInsets.all(0),
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          child: Icon(
+            Icons.info_outline,
+            color: Colors.white,
+          ),
+          color: Colors.transparent,
+          onPressed: () async {
+            await showDialog(
+              context: context,
+              builder: (ctxt) {
+                return Dialog(
+                    child: Container(
                   width: 280,
                   height: 300,
                   child: Column(
@@ -742,11 +763,11 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                         width: 280,
                         height: 260,
                         decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: ExactAssetImage('assets/muscles/' + muscleName + '.gif'),
-                            fit: BoxFit.cover,
-                          )
-                        ),
+                            image: DecorationImage(
+                          image: ExactAssetImage(
+                              'assets/muscles/' + muscleName + '.gif'),
+                          fit: BoxFit.cover,
+                        )),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -767,41 +788,35 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                         child: Row(
                           children: [
                             Icon(Icons.info_outline, color: Colors.white),
-                            Text(
-                              licenseMap[muscleName],
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 8,
-                              )
-                            ),
+                            Text(licenseMap[muscleName],
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8,
+                                )),
                           ],
                         ),
                       )
                     ],
                   ),
-                  
-
-                )
-              );
-            },
-          );
-        }
-      );
+                ));
+              },
+            );
+          });
     } else {
       child1 = FlatButton(
-        padding: EdgeInsets.all(0),
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        child: Icon(
-          Icons.info_outline,
-          color: Colors.white,
-        ),
-        color: Colors.transparent,
-        onPressed: () async {
-          await showDialog(
-            context: context,
-            builder: (ctxt) {
-              return Dialog(
-                child: Container(
+          padding: EdgeInsets.all(0),
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          child: Icon(
+            Icons.info_outline,
+            color: Colors.white,
+          ),
+          color: Colors.transparent,
+          onPressed: () async {
+            await showDialog(
+              context: context,
+              builder: (ctxt) {
+                return Dialog(
+                    child: Container(
                   width: 280,
                   height: 300,
                   child: Column(
@@ -810,11 +825,11 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                         width: 280,
                         height: 260,
                         decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: ExactAssetImage('assets/muscles/' + muscleName + '.png'),
-                            fit: BoxFit.cover,
-                          )
-                        ),
+                            image: DecorationImage(
+                          image: ExactAssetImage(
+                              'assets/muscles/' + muscleName + '.png'),
+                          fit: BoxFit.cover,
+                        )),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -835,26 +850,20 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
                         child: Row(
                           children: [
                             Icon(Icons.info_outline, color: Colors.white),
-                            Text(
-                              licenseMap[muscleName],
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 7,
-                              )
-                            ),
+                            Text(licenseMap[muscleName],
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 7,
+                                )),
                           ],
                         ),
                       )
                     ],
                   ),
-                  
-
-                )
-              );
-            },
-          );
-        }
-      );
+                ));
+              },
+            );
+          });
     }
     return DropdownMenuItem(
       child: new Container(
@@ -881,6 +890,7 @@ class CustomWorkoutBuilder extends StatefulWidget {
   @override
   _CustomWorkoutBuilder createState() => _CustomWorkoutBuilder();
 }
+
 class _CustomWorkoutBuilder extends State<CustomWorkoutBuilder> {
   final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
@@ -894,6 +904,7 @@ class _CustomWorkoutBuilder extends State<CustomWorkoutBuilder> {
       children: getExerciseWidgets(context),
     );
   }
+
   List<Widget> getExerciseWidgets(BuildContext context) {
     List<Widget> widgets = [];
     for (int i = 0; i < exerciseButtons; i++) {
@@ -901,7 +912,7 @@ class _CustomWorkoutBuilder extends State<CustomWorkoutBuilder> {
     }
     return widgets;
   }
-  
+
   Widget getExerciseButton(int index) {
     if (selectedItems.length == index) {
       selectedItems.add(globals.SHRUGS);
@@ -923,7 +934,7 @@ class _CustomWorkoutBuilder extends State<CustomWorkoutBuilder> {
         isCaseSensitiveSearch: false,
         searchHint: new Text(
           "Select one",
-          style:TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.black),
         ),
         style: TextStyle(color: Colors.black, fontFamily: "Times New Roman"),
         onChanged: (val) {
@@ -935,12 +946,14 @@ class _CustomWorkoutBuilder extends State<CustomWorkoutBuilder> {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     loadExerciseList(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add your workout', style: Theme.of(context).textTheme.button),
+        title:
+            Text('Add your workout', style: Theme.of(context).textTheme.button),
         bottom: PreferredSize(
           child: Container(
             color: Colors.grey,
@@ -973,7 +986,6 @@ class _CustomWorkoutBuilder extends State<CustomWorkoutBuilder> {
                     contentPadding: EdgeInsets.all(20.0),
                   ),
                   controller: nameController,
-     
                 ),
                 getExerciseColumn(context),
                 RaisedButton(
@@ -991,13 +1003,12 @@ class _CustomWorkoutBuilder extends State<CustomWorkoutBuilder> {
                   color: Theme.of(context).accentColor,
                   focusColor: Color(0xFF525252),
                   child: Text("Remove Last Exercise",
-                    style: Theme.of(context).textTheme.button
-                  ),
+                      style: Theme.of(context).textTheme.button),
                   onPressed: () {
                     setState(() {
                       exerciseButtons -= 1;
                       List<globals.Exercise> newSM = [];
-                      for(int i = 0; i < selectedItems.length - 1; i++) {
+                      for (int i = 0; i < selectedItems.length - 1; i++) {
                         newSM.add(selectedItems[i]);
                       }
                       selectedItems = newSM;
@@ -1012,7 +1023,8 @@ class _CustomWorkoutBuilder extends State<CustomWorkoutBuilder> {
                   onPressed: () async {
                     if (_formKey.currentState.validate()) {
                       String name = nameController.text;
-                      globals.Workout workout = globals.Workout(name, selectedItems);
+                      globals.Workout workout =
+                          globals.Workout(name, selectedItems);
                       await globals.saveWorkout(workout);
                       Navigator.of(context).popUntil((route) => route.isFirst);
                       Navigator.pushReplacement(
@@ -1033,7 +1045,7 @@ class _CustomWorkoutBuilder extends State<CustomWorkoutBuilder> {
   }
 
   void loadExerciseList(BuildContext context) {
-    if(items.length > 2) {
+    if (items.length > 2) {
       return;
     }
     globals.EXERCISES.forEach((exercise) {
@@ -1050,6 +1062,7 @@ class _CustomWorkoutBuilder extends State<CustomWorkoutBuilder> {
     });
   }
 }
+
 class WorkoutPage extends StatefulWidget {
   WorkoutPage({Key key, this.workout}) : super(key: key);
   //The title passed in from the home page
@@ -1066,6 +1079,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
     super.initState();
     workout = widget.workout;
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1137,42 +1151,41 @@ class _WorkoutPageState extends State<WorkoutPage> {
           return showDialog(
             context: context,
             builder: (ctx) => AlertDialog(
-              backgroundColor: Theme.of(ctx).accentColor,
-              title: Text(
-                'Are you sure?',
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-              content: Text(
-                'Do you want to remove this exercise?',
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-              actions: <Widget>[
-                FlatButton(
-                  color: tertiaryColor,
-                  child: Text(
-                    'No',
-                    style: TextStyle(color: Colors.white),
+                backgroundColor: Theme.of(ctx).accentColor,
+                title: Text(
+                  'Are you sure?',
+                  style: TextStyle(
+                    color: Colors.white,
                   ),
-                  onPressed: () {
-                    Navigator.of(ctx).pop(false);
-                  },
                 ),
-                FlatButton(
-                  color: tertiaryColor,
-                  child: Text(
-                    'Yes',
-                    style: TextStyle(color: Colors.white),
+                content: Text(
+                  'Do you want to remove this exercise?',
+                  style: TextStyle(
+                    color: Colors.white,
                   ),
-                  onPressed: () {
-                    Navigator.of(ctx).pop(true);
-                  },
                 ),
-              ]
-            ),
+                actions: <Widget>[
+                  FlatButton(
+                    color: tertiaryColor,
+                    child: Text(
+                      'No',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      Navigator.of(ctx).pop(false);
+                    },
+                  ),
+                  FlatButton(
+                    color: tertiaryColor,
+                    child: Text(
+                      'Yes',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      Navigator.of(ctx).pop(true);
+                    },
+                  ),
+                ]),
           );
         },
         onDismissed: (direction) {
@@ -1199,7 +1212,8 @@ class _WorkoutPageState extends State<WorkoutPage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => MyHomePage(title: "Home", index: 0)),
+                        builder: (context) =>
+                            MyHomePage(title: "Home", index: 0)),
                   );
                 }
               });
@@ -1221,12 +1235,10 @@ class _WorkoutPageState extends State<WorkoutPage> {
             ],
           );
           showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return alert;
-            }
-          );
-         
+              context: context,
+              builder: (BuildContext context) {
+                return alert;
+              });
         }));
     return ls;
   }
@@ -1258,7 +1270,7 @@ class _SetupPageState extends State<SetupPage> {
     {
       'value': 'homeGym',
       'label': 'Home Gym',
-      'icon': Icon(Icons.arrow_back),
+      'icon': Icon(Icons.home),
       'textStyle': TextStyle(color: Colors.black),
     },
     {
@@ -1355,7 +1367,7 @@ class _SetupPageState extends State<SetupPage> {
                               controller: _typeController,
                               icon: Icon(Icons.fitness_center),
                               labelText: 'Gym Type',
-                              style: TextStyle( color: Colors.black),
+                              style: TextStyle(color: Colors.black),
                               changeIcon: true,
                               dialogTitle: 'Pick your gym type',
                               items: _gyms,
@@ -1385,8 +1397,8 @@ class _SetupPageState extends State<SetupPage> {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              MyHomePage(title: "Home", index: 0)),
+                                          builder: (context) => MyHomePage(
+                                              title: "Home", index: 0)),
                                     );
                                   }
                                 }
@@ -1422,7 +1434,7 @@ class _SetupPageState extends State<SetupPage> {
                                 valueField: 'value',
                                 okButtonLabel: 'CONFIRM',
                                 cancelButtonLabel: 'CANCEL',
-                                dialogTextStyle: TextStyle( color: Colors.black ),
+                                dialogTextStyle: TextStyle(color: Colors.black),
                                 hintWidget: Text(
                                     "Please select any equipment you have"),
                                 initialValue: _gymTools,
@@ -1448,8 +1460,8 @@ class _SetupPageState extends State<SetupPage> {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            MyHomePage(title: "Home",index: 0)),
+                                        builder: (context) => MyHomePage(
+                                            title: "Home", index: 0)),
                                   );
                                 }
                               },

@@ -8,7 +8,7 @@ import 'dart:io';
 
 String url = "http://142.93.112.148/file/";
 List<String> sections = [
- // "Nutrition",
+  "Nutrition",
   "Supplementation",
   "Pre-Workouts",
   "Beginner Questions",
@@ -20,7 +20,7 @@ void setupResearch() async {
   final path = directory.path;
   Directory rDir = Directory("$path/research");
   bool rDirExists = await rDir.exists();
-  if(!rDirExists) {
+  if (!rDirExists) {
     //Make Dir and start making files
     rDir.createSync();
 
@@ -43,18 +43,18 @@ void setupResearch() async {
     });
 
     //getNutritionFile().then((val) {
-      //File nFile = File('$path/research/Nutrition.txt');
-     // nFile.writeAsString(val);
+    //File nFile = File('$path/research/Nutrition.txt');
+    // nFile.writeAsString(val);
     //});
   } else {
     //Make Sure every file exists
-    
+
     //Start With Supplements
-    supplements.forEach((supp){
+    supplements.forEach((supp) {
       File sFile = File('$path/research/$supp.txt');
       bool exists = sFile.existsSync();
 
-      if(!exists) {
+      if (!exists) {
         //if file does not exist, download it
         getSupplementFile(supp).then((val) {
           sFile.writeAsString(val);
@@ -64,15 +64,15 @@ void setupResearch() async {
     //Questions File
     File qFile = File('$path/research/Questions.txt');
     bool exists = await qFile.exists();
-    if(!exists) {
-      getQuestionsFile().then((val){
+    if (!exists) {
+      getQuestionsFile().then((val) {
         qFile.writeAsString(val);
       });
     }
     //StrengthPrograms File
     File spFile = File('$path/research/StrengthPrograms.txt');
     exists = await spFile.exists();
-    if(!exists) {
+    if (!exists) {
       getStrengthProgramsFile().then((val) {
         spFile.writeAsString(val);
       });
@@ -82,37 +82,46 @@ void setupResearch() async {
     //File nFile = File('$path/research/Nutrition.txt');
     //exists = await nFile.exists();
     //if(!exists) {
-      //getNutritionFile().then((val) {
-       // nFile.writeAsString(val);
-      //});
+    //getNutritionFile().then((val) {
+    // nFile.writeAsString(val);
+    //});
     //}
   }
 }
 
 List<String> supplements = [
-  "Creatine", "Ashwagandha", "L-Citrulline", "Glycerol", "Beta-Alanine",
-  "Caffiene", "Theacrine",
+  "Creatine",
+  "Ashwagandha",
+  "L-Citrulline",
+  "Glycerol",
+  "Beta-Alanine",
+  "Caffiene",
+  "Theacrine",
 ];
 Future<String> getNutritionFile() async {
   String urlP = url + "Nutrition";
   var response = await http.get(urlP);
   return response.body;
 }
+
 Future<String> getSupplementFile(String supplement) async {
   String urlP = url + supplement;
   var response = await http.get(urlP);
   return response.body;
 }
+
 Future<String> getQuestionsFile() async {
   String urlP = url + 'Questions';
   var response = await http.get(urlP);
   return response.body;
 }
+
 Future<String> getStrengthProgramsFile() async {
   String urlP = url + 'StrengthPrograms';
   var response = await http.get(urlP);
   return response.body;
 }
+
 Future<String> getSupplementInfo(String supplement) async {
   final directory = await getApplicationDocumentsDirectory();
   final path = directory.path;
@@ -126,11 +135,11 @@ class Question {
   Question(this.question, this.answer);
 
   Map<String, String> toJson() => {
-    'Question': question,
-    'Answer': answer,
-  };
-
+        'Question': question,
+        'Answer': answer,
+      };
 }
+
 Future<List<Question>> getQuestions() async {
   List<Question> questions = [];
   final directory = await getApplicationDocumentsDirectory();
@@ -152,16 +161,18 @@ Future<List<Question>> getQuestions() async {
 
   return questions;
 }
+
 class StrengthProgram {
   String name, link, difficulty;
   StrengthProgram(this.name, this.link, this.difficulty);
 
   Map<String, String> toJson() => {
-    'Name': name,
-    'Link': link,
-    'Difficulty': difficulty,
-  };
+        'Name': name,
+        'Link': link,
+        'Difficulty': difficulty,
+      };
 }
+
 Future<List<StrengthProgram>> getStrengthPrograms() async {
   List<StrengthProgram> programs = [];
   final directory = await getApplicationDocumentsDirectory();
@@ -175,7 +186,7 @@ Future<List<StrengthProgram>> getStrengthPrograms() async {
     String link = q['Link'];
     String difficulty = q['Difficulty'];
 
-    StrengthProgram p = StrengthProgram(name,link,difficulty);
+    StrengthProgram p = StrengthProgram(name, link, difficulty);
     programs.add(p);
   });
 
