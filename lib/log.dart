@@ -32,14 +32,19 @@ void setupLog() async {
 //Log Weight, (height?)
 class PersonalLog {
   double height, weight;
+  String unitsH, unitsW;
   DateTime date;
   PersonalLog(this.height, this.weight);
   PersonalLog.withDate(this.height, this.weight, this.date);
+  PersonalLog.withUnits(
+      this.height, this.unitsH, this.weight, this.unitsW, this.date);
   PersonalLog.onlyWeight(this.weight);
 
   Map<String, dynamic> toJson() => {
         'Height': height,
         'Weight': weight,
+        'UnitsH': unitsH,
+        'UnitsW': unitsW,
         'Date': date.toString(),
       };
   @override
@@ -85,7 +90,17 @@ Future<void> addToPersonalLog(PersonalLog entry) async {
       double height = l['Height'];
       double weight = l['Weight'];
       DateTime date = DateTime.parse(l['Date']);
-      PersonalLog log = PersonalLog.withDate(height, weight, date);
+
+      String unitsH = l['UnitsH'];
+      String unitsW = l['UnitsW'];
+      if (unitsH == null) {
+        unitsH = "in";
+      }
+      if (unitsW == null) {
+        unitsW = "lbs";
+      }
+      PersonalLog log =
+          PersonalLog.withUnits(height, unitsH, weight, unitsW, date);
       logData.add(log);
     });
   } else {
@@ -113,7 +128,16 @@ Future<void> removeFromPersonalLog(PersonalLog entry) async {
     double height = l['Height'];
     double weight = l['Weight'];
     DateTime date = DateTime.parse(l['Date']);
-    PersonalLog log = PersonalLog.withDate(height, weight, date);
+    String unitsH = l['UnitsH'];
+    String unitsW = l['UnitsW'];
+    if (unitsH == null) {
+      unitsH = "in";
+    }
+    if (unitsW == null) {
+      unitsW = "lbs";
+    }
+    PersonalLog log =
+        PersonalLog.withUnits(height, unitsH, weight, unitsW, date);
     logData.add(log);
   });
   int toRemove = -1;
@@ -150,7 +174,16 @@ Future<List<PersonalLog>> getPersonalLog() async {
       double height = l['Height'];
       double weight = l['Weight'];
       DateTime date = DateTime.parse(l['Date']);
-      PersonalLog log = PersonalLog.withDate(height, weight, date);
+      String unitsH = l['UnitsH'];
+      String unitsW = l['UnitsW'];
+      if (unitsH == null) {
+        unitsH = "in";
+      }
+      if (unitsW == null) {
+        unitsW = "lbs";
+      }
+      PersonalLog log =
+          PersonalLog.withUnits(height, unitsH, weight, unitsW, date);
       logData.add(log);
     });
     logData.sort((a, b) => b.date.compareTo(a.date));
@@ -577,6 +610,9 @@ class _LogHome extends State<LogHome> {
                 int ft = (entry.height / 12).truncate();
                 int inches = (entry.height % 12).truncate();
                 String height = ft.toString() + "\'" + inches.toString() + "\"";
+                if (entry.unitsH == "cm") {
+                  height = entry.height.toString();
+                }
                 double rowWidth = MediaQuery.of(context).size.width * .9;
                 Container newRow = Container(
                   decoration: BoxDecoration(
@@ -602,7 +638,7 @@ class _LogHome extends State<LogHome> {
                         width: rowWidth * .3,
                         alignment: Alignment.center,
                         child: Text(
-                          entry.weight.toString() + " lbs",
+                          entry.weight.toString() + entry.unitsW.toString(),
                           style: TextStyle(
                             color: Colors.black,
                             fontFamily: "Times New Roman",
@@ -843,6 +879,59 @@ class _BodyLogEntry extends State<BodyLogEntry> {
 
   DateTime selectedDate = DateTime.now();
 
+  List<DropdownMenuItem<String>> unitsW = [
+    new DropdownMenuItem(
+      child: new Text("Pounds", style: TextStyle(color: Colors.white)),
+      value: "lbs",
+    ),
+    new DropdownMenuItem(
+      child: new Text("Kilograms", style: TextStyle(color: Colors.white)),
+      value: "kgs",
+    ),
+  ];
+  List<DropdownMenuItem<String>> unitsH = [
+    new DropdownMenuItem(
+      child: new Text("inches", style: TextStyle(color: Colors.white)),
+      value: "in",
+    ),
+    new DropdownMenuItem(
+      child: new Text("cm", style: TextStyle(color: Colors.white)),
+      value: "cm",
+    ),
+  ];
+
+  Widget getUnitButton(BuildContext context, String u) {
+    List<DropdownMenuItem<String>> items;
+    if (u == "height") {
+      items = unitsH;
+    } else {
+      items = unitsW;
+    }
+    return Container(
+      width: MediaQuery.of(context).size.width * .8 * .4,
+      child: DropdownButton(
+          dropdownColor: Theme.of(context).accentColor,
+          focusColor: Color(0xFF525252),
+          items: items,
+          hint: new Text(
+            'Select Units',
+            style: TextStyle(color: Colors.white),
+          ),
+          value: u == "height" ? unitH : unitW,
+          onChanged: (value) {
+            setState(() {
+              if (u == "height") {
+                unitH = value;
+              } else {
+                unitW = value;
+              }
+            });
+          }),
+    );
+  }
+
+  String unitH = "in";
+  String unitW = "lbs";
   Future<void> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
         context: context,
@@ -912,7 +1001,7 @@ class _BodyLogEntry extends State<BodyLogEntry> {
                 child: Row(
                   children: [
                     Container(
-                      width: MediaQuery.of(context).size.width * .8 * .75,
+                      width: MediaQuery.of(context).size.width * .8 * .6,
                       child: TextFormField(
                         style: Theme.of(context).textTheme.button,
                         cursorColor: Colors.white,
@@ -932,16 +1021,7 @@ class _BodyLogEntry extends State<BodyLogEntry> {
                         controller: heightController,
                       ),
                     ),
-                    Container(
-                      width: MediaQuery.of(context).size.width * .8 * .25,
-                      child: Text(
-                        "inches",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: "Times New Roman",
-                        ),
-                      ),
-                    ),
+                    getUnitButton(context, "height"),
                   ],
                 ),
               ),
@@ -953,7 +1033,7 @@ class _BodyLogEntry extends State<BodyLogEntry> {
                 child: Row(
                   children: [
                     Container(
-                      width: MediaQuery.of(context).size.width * .8 * .75,
+                      width: MediaQuery.of(context).size.width * .8 * .6,
                       child: TextFormField(
                         style: Theme.of(context).textTheme.button,
                         cursorColor: Colors.white,
@@ -973,16 +1053,7 @@ class _BodyLogEntry extends State<BodyLogEntry> {
                         controller: weightController,
                       ),
                     ),
-                    Container(
-                      width: MediaQuery.of(context).size.width * .8 * .25,
-                      child: Text(
-                        "pounds",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: "Times New Roman",
-                        ),
-                      ),
-                    ),
+                    getUnitButton(context, "weight"),
                   ],
                 ),
               ),
@@ -1030,8 +1101,8 @@ class _BodyLogEntry extends State<BodyLogEntry> {
                         double weight = double.parse(weightText);
                         DateTime time = selectedDate;
 
-                        PersonalLog entry =
-                            PersonalLog.withDate(height, weight, time);
+                        PersonalLog entry = PersonalLog.withUnits(
+                            height, unitH, weight, unitW, time);
                         addToPersonalLog(entry).then((_) {
                           Navigator.of(context)
                               .popUntil((route) => route.isFirst);
