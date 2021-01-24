@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'dart:io';
+import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 
@@ -1892,18 +1893,21 @@ class _WorkoutLogger extends State<WorkoutLogger> {
     if (exercises.length == index) {
       exercises.add(EXERCISES[0]);
     }
-    return DropdownButton(
-        dropdownColor: Colors.white,
-        focusColor: Color(0xFF525252),
-        items: exerciseList,
-        hint:
-            new Text('Select Exercise', style: TextStyle(color: Colors.black)),
-        value: exercises[index],
-        onChanged: (value) {
-          setState(() {
-            exercises[index] = value;
-          });
+    return SearchableDropdown(
+      menuBackgroundColor: Colors.white,
+      searchHint: new Text(
+        "Select Exercise",
+        style: TextStyle(color: Colors.black),
+      ),
+      items: exerciseList,
+      hint: new Text('Select Exercise', style: TextStyle(color: Colors.black)),
+      value: exercises[index],
+      onChanged: (value) {
+        setState(() {
+          exercises[index] = value;
         });
+      },
+    );
   }
 
   void loadExerciseList() {

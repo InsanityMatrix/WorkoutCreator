@@ -30,6 +30,8 @@ const MaterialColor primaryBlack = MaterialColor(
 );
 Config mainConfig;
 Color tertiaryColor = new Color(0xFF52689c);
+bool downloadedFiles = false;
+bool gotConfigExists = false;
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -52,7 +54,7 @@ class MyApp extends StatelessWidget {
               color: Colors.white,
             ),
             subtitle1: TextStyle(
-              color: Color(0xFFFFFFFF),
+              color: Colors.black,
             )),
       ),
       home: MyHomePage(title: "Home", index: 0),
@@ -74,24 +76,30 @@ class _MyHomePage extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    setupResearch();
+    if (!downloadedFiles) {
+      setupResearch();
+      downloadedFiles = true;
+    }
     setupLog();
     setState(() {
       _currentIndex = widget.index;
     });
-    configExists().then((bool data) {
-      if (!data) {
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => SetupPage(),
-            ));
-      } else {
-        getConfig().then((Config config) {
-          mainConfig = config;
-        });
-      }
-    });
+    if (!gotConfigExists) {
+      gotConfigExists = true;
+      configExists().then((bool data) {
+        if (!data) {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SetupPage(),
+              ));
+        } else {
+          getConfig().then((Config config) {
+            mainConfig = config;
+          });
+        }
+      });
+    }
   }
 
   @override
@@ -609,111 +617,123 @@ class _WorkoutBuilderPageState extends State<WorkoutBuilderPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Form(
-            key: _formKey,
-            child: Column(
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height - 84,
+            child: ListView(
               children: <Widget>[
-                TextFormField(
-                  autocorrect: true,
-                  style: Theme.of(context).textTheme.button,
-                  cursorColor: Colors.white,
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'You need to enter a workout name';
-                    }
-                    return null;
-                  },
-                  decoration: const InputDecoration(
-                    labelText: 'Workout Name',
-                    labelStyle: TextStyle(color: Color(0xFFdbdbdb)),
-                    contentPadding: EdgeInsets.all(20.0),
-                  ),
-                  controller: nameController,
-                ),
-                Container(
-                  alignment: Alignment(0, 0),
-                  width: MediaQuery.of(context).size.width,
-                  padding: EdgeInsets.only(left: 20, right: 20),
-                  child: TextField(
-                    decoration: new InputDecoration(
-                        labelText: "Exercises Per Muscle Group",
-                        labelStyle: TextStyle(color: Colors.white)),
-                    keyboardType: TextInputType.number,
-                    onChanged: (val) {
-                      if (val == "") {
-                        return;
-                      }
-                      int value = int.parse(val);
-                      if (value > 0) {
-                        FocusScope.of(context).unfocus();
-                      }
-                    },
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
-                    controller: epmController,
-                    style: Theme.of(context).textTheme.button,
-                    cursorColor: Colors.white,
-                  ),
-                ),
-                getMGBColumn(),
-                RaisedButton(
-                  color: Theme.of(context).accentColor,
-                  focusColor: Color(0xFF525252),
-                  child: Text("Add Another Muscle (group)",
-                      style: Theme.of(context).textTheme.button),
-                  onPressed: () {
-                    setState(() {
-                      muscleGroupButtons += 1;
-                    });
-                  },
-                ),
-                RaisedButton(
-                  color: Theme.of(context).accentColor,
-                  focusColor: Color(0xFF525252),
-                  child: Text("Remove Last Muscle (group)",
-                      style: Theme.of(context).textTheme.button),
-                  onPressed: () {
-                    setState(() {
-                      muscleGroupButtons -= 1;
-                      List<int> newSM = [];
-                      for (int i = 0; i < selectedMuscles.length - 1; i++) {
-                        newSM.add(selectedMuscles[i]);
-                      }
-                      selectedMuscles = newSM;
-                    });
-                  },
-                ),
-                RaisedButton(
-                  color: Theme.of(context).accentColor,
-                  focusColor: Color(0xFF525252),
-                  child: Text("Create Workout",
-                      style: Theme.of(context).textTheme.button),
-                  onPressed: () {
-                    if (_formKey.currentState.validate()) {
-                      String name = nameController.text;
-                      String epmString = epmController.text;
-                      int epm = int.parse(epmString);
-                      if (epm == 0) {
-                        epm = 1;
-                      }
-                      List<int> muscleChoices = [];
-                      for (int i = 0; i < muscleGroupButtons; i++) {
-                        muscleChoices.add(selectedMuscles[i]);
-                      }
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: <Widget>[
+                      TextFormField(
+                        autocorrect: true,
+                        style: Theme.of(context).textTheme.button,
+                        cursorColor: Colors.white,
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'You need to enter a workout name';
+                          }
+                          return null;
+                        },
+                        decoration: const InputDecoration(
+                          labelText: 'Workout Name',
+                          labelStyle: TextStyle(color: Color(0xFFdbdbdb)),
+                          contentPadding: EdgeInsets.all(20.0),
+                        ),
+                        controller: nameController,
+                      ),
+                      Container(
+                        alignment: Alignment(0, 0),
+                        width: MediaQuery.of(context).size.width,
+                        padding: EdgeInsets.only(left: 20, right: 20),
+                        child: TextField(
+                          decoration: new InputDecoration(
+                              labelText: "Exercises Per Muscle Group",
+                              labelStyle: TextStyle(color: Colors.white)),
+                          keyboardType: TextInputType.number,
+                          onChanged: (val) {
+                            if (val == "") {
+                              return;
+                            }
+                            int value = int.parse(val);
+                            if (value > 0) {
+                              FocusScope.of(context).unfocus();
+                            }
+                          },
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          controller: epmController,
+                          style: Theme.of(context).textTheme.button,
+                          cursorColor: Colors.white,
+                        ),
+                      ),
+                      getMGBColumn(),
+                      RaisedButton(
+                        color: Theme.of(context).accentColor,
+                        focusColor: Color(0xFF525252),
+                        child: Text("Add Another Muscle (group)",
+                            style: Theme.of(context).textTheme.button),
+                        onPressed: () {
+                          setState(() {
+                            muscleGroupButtons += 1;
+                          });
+                        },
+                      ),
+                      RaisedButton(
+                        color: Theme.of(context).accentColor,
+                        focusColor: Color(0xFF525252),
+                        child: Text("Remove Last Muscle (group)",
+                            style: Theme.of(context).textTheme.button),
+                        onPressed: () {
+                          setState(() {
+                            muscleGroupButtons -= 1;
+                            List<int> newSM = [];
+                            for (int i = 0;
+                                i < selectedMuscles.length - 1;
+                                i++) {
+                              newSM.add(selectedMuscles[i]);
+                            }
+                            selectedMuscles = newSM;
+                          });
+                        },
+                      ),
+                      RaisedButton(
+                        color: Theme.of(context).accentColor,
+                        focusColor: Color(0xFF525252),
+                        child: Text("Create Workout",
+                            style: Theme.of(context).textTheme.button),
+                        onPressed: () {
+                          if (_formKey.currentState.validate()) {
+                            String name = nameController.text;
+                            String epmString = epmController.text;
+                            int epm = int.parse(epmString);
+                            if (epm == 0) {
+                              epm = 1;
+                            }
+                            List<int> muscleChoices = [];
+                            for (int i = 0; i < muscleGroupButtons; i++) {
+                              muscleChoices.add(selectedMuscles[i]);
+                            }
 
-                      globals.Workout workout = globals.createWorkout(
-                          name, epm, muscleChoices, mainConfig);
-                      http.get("http://142.93.112.148/stats/createworkout");
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                WorkoutPage(workout: workout)),
-                      );
-                    }
-                  },
+                            globals.Workout workout = globals.createWorkout(
+                                name, epm, muscleChoices, mainConfig);
+                            http.get(
+                                "http://142.93.112.148/stats/createworkout");
+                            Navigator.of(context)
+                                .popUntil((route) => route.isFirst);
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      WorkoutPage(workout: workout)),
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -1159,7 +1179,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
               title: Text(workout.exercises[i].name,
                   style: Theme.of(context).textTheme.button),
               subtitle: Text(workout.exercises[i].subtitle(),
-                  style: Theme.of(context).textTheme.subtitle1),
+                  style: Theme.of(context).textTheme.button),
               trailing: IconButton(
                 icon: Icon(Icons.refresh),
                 color: Colors.white,
@@ -1305,7 +1325,7 @@ class _SetupPageState extends State<SetupPage> {
     },
     {
       'value': 'park',
-      'label': 'Calisthenics Park',
+      'label': 'Calisthenics',
       'icon': Icon(Icons.park),
       'textStyle': TextStyle(color: Colors.black),
     }

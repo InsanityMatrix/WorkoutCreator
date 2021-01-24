@@ -263,8 +263,8 @@ Exercise PLANK = new Exercise("Plank", ABS, null, ["calisthenics"]);
 //Calisthenics
 Exercise INVERTED_ROWS = new Exercise(
     "Inverted Rows", DELTOIDS, [LATS, RHOMBOIDS, BICEPS], ["calisthenics"]);
-Exercise BW_REAR_DELT_FLY = new Exercise("Bodyweight Rear Delt Fly", DELTOIDS,
-    [RHOMBOIDS, TRAPEZIUS], ["calisthenics"]);
+Exercise BW_REAR_DELT_FLY = new Exercise("Bodyweight Rear Delt Fly", RHOMBOIDS,
+    [DELTOIDS, TRAPEZIUS], ["calisthenics"]);
 Exercise PIKE_PRESS =
     new Exercise("Pike Press", DELTOIDS, [TRICEPS], ["calisthenics"]);
 Exercise INVERTED_SHRUGS =
@@ -273,7 +273,13 @@ Exercise HANGING_LEG_LIFTS =
     new Exercise("Hanging Leg Lifts", ABS, [], ["pullupbar", "calisthenics"]);
 Exercise SINGLE_LEG_GLUTE_BRIDGE =
     new Exercise("Single-Leg Glute Bridge", GLUTES, [], ["calisthenics"]);
-
+Exercise DECLINE_PUSHUPS = new Exercise(
+    "Decline Pushups", CHEST, [DELTOIDS, TRICEPS], ["calisthenics"]);
+Exercise CHEST_DIPS =
+    new Exercise("Chest Dips", CHEST, [TRICEPS], ["calisthenics"]);
+Exercise CLOSE_GRIP_CHINUPS = new Exercise(
+    "Close Grip Chinups", BICEPS, [LATS, RHOMBOIDS], ["calisthenics"]);
+Exercise DRAGON_FLAGS = new Exercise("Dragon Flags", ABS, [], ["calisthenics"]);
 List<Exercise> EXERCISES = [
   SHRUGS,
   BENCHPRESS,
@@ -332,6 +338,10 @@ List<Exercise> EXERCISES = [
   REVERSE_CRUNCH,
   PLANK,
   SINGLE_LEG_GLUTE_BRIDGE,
+  DECLINE_PUSHUPS,
+  CHEST_DIPS,
+  CLOSE_GRIP_CHINUPS,
+  DRAGON_FLAGS
 ];
 
 Workout createWorkout(
@@ -644,6 +654,7 @@ Future<List<String>> getWorkouts() async {
       names.add(n.replaceAll(".json", ""));
     }
   });
+  names.sort();
   return names;
 }
 

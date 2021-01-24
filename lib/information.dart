@@ -80,6 +80,7 @@ List<String> supplements = [
   "Creatine",
   "Ashwagandha",
   "L-Citrulline",
+  "L-Carnitine",
   "Glycerol",
   "Beta-Alanine",
   "Caffiene",
